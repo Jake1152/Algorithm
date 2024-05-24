@@ -58,7 +58,11 @@ string Subtract(string str1, string str2)
     iterator erase (iterator first, iterator last);
 	*/
 	while (result.at(0) == '0')
-		result.erase(0, 1);
+	{
+		// result.erase(0, 1);
+		// result.erase(result.begin());
+		result.erase(result.begin(), result.begin() + 1);
+	}
 
 	std::cout << "# result  : " << result << endl;
 	return result;
