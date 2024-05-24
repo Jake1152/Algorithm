@@ -4,11 +4,66 @@
 
 using namespace std;
 
+/** 입력도 문자열, 출력도 문자열
+ * 작은 자릿수부터 더 한다.
+ * 
+ * 생각나는대로 여러가지 시도
+*/
 string Add(string str1, string str2)
 {
 	// TODO:
+	std::string addtionResultStr;
 
-	return string("0");
+	// addtionResultStr += str1;
+	// std::cout << "str1 : " << str1 << std::endl;
+	// std::cout << "str2 : " << str2 << std::endl;
+	
+	int carry = 0;
+	int idx_str1= str1.size() - 1;
+	int idx_str2= str2.size() - 1;
+
+	while (idx_str1 >= 0 && idx_str2 >= 0)
+	{
+		int digitAddtionResult;
+		int curDigitResult;
+
+		// std::cout << "str1.at(idx_str1) : " << str1.at(idx_str1) << ",\tidx_str1 : " << idx_str1 << std::endl;
+		// std::cout << "str2[idx_str2] : " << str2[idx_str2] << ",\tidx_str2 : " << idx_str2 << std::endl;
+		digitAddtionResult = static_cast<int>(str1.at(idx_str1)) - '0' + static_cast<int>(str2[idx_str2]) - '0' + carry;
+		// std::cout << "digitAddtionResult : " << digitAddtionResult << std::endl;
+		carry = digitAddtionResult / 10;
+		curDigitResult = digitAddtionResult % 10;
+		addtionResultStr = to_string(curDigitResult) + addtionResultStr; // to_string이외에 바꿀 방법은 없는가?
+		// std::cout << "addtionResultStr : " << addtionResultStr << std::endl;
+		idx_str1--;
+		idx_str2--;
+	}
+
+	while (idx_str1 >= 0)
+	{
+		int digitAddtionResult = static_cast<int>(str1.at(idx_str1)) - '0' + carry;
+		// std::cout << "digitAddtionResult : " << digitAddtionResult << std::endl;
+		carry = digitAddtionResult / 10;
+		int curDigitResult = digitAddtionResult % 10;
+		addtionResultStr = to_string(curDigitResult) + addtionResultStr; // to_string이외에 바꿀 방법은 없는가?
+		idx_str1--;
+	}
+
+	while (idx_str2 >= 0)
+	{
+		int digitAddtionResult = static_cast<int>(str2[idx_str2]) - '0' + carry;
+		// std::cout << "digitAddtionResult : " << digitAddtionResult << std::endl;
+		carry = digitAddtionResult / 10;
+		int curDigitResult = digitAddtionResult % 10;
+		addtionResultStr = to_string(curDigitResult) + addtionResultStr; // to_string이외에 바꿀 방법은 없는가?
+		idx_str2--;
+	}
+	
+	if (carry) 
+		addtionResultStr = to_string(carry) + addtionResultStr;
+
+	// std::cout << "addtionResultStr : " << addtionResultStr << std::endl;
+	return addtionResultStr;
 }
 
 int main()
