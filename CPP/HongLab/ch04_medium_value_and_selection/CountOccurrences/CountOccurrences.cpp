@@ -18,15 +18,28 @@ void Print(vector<int>& arr)
 // O(n)
 int Count1(const vector<int>& arr, int target)
 {
-    int count = 0;
+    
+	/*
+	int count = 0;
 	//TODO: O(n)
     for (auto element : arr)
         if (target == element)
             count++;
 	return count;
+	*/
+
+	// # honglab
+	// 무식하게(brute-force) 하나하나 찾아보는 방식입니다.
+    int c = 0;
+    for (const auto& v : arr)
+        if (v == target) c += 1;
+    return c;
+
 }
 
-/** Binary Search
+
+// # mine
+/** Binary Search, 
  * x값의 시작 위치를 찾아야한다.
  * 1 1 3 3 3 4 4 5 6 7 7 7 7 7 8 8 8 9 10 10 
  *     a b c
@@ -35,6 +48,7 @@ int Count1(const vector<int>& arr, int target)
  * 작아지기 직전까지 가야한다.
  * 
  */
+/*
 int Count2(const vector<int>& arr, int target)
 {
 	//TODO: O(log(n) + count)
@@ -70,10 +84,53 @@ int Count2(const vector<int>& arr, int target)
 	}
 	return count;
 }
+*/
 
+// # honglab way
+int BinarySearch(const vector<int>& arr, int lo, int hi, int x)
+{
+    while (lo <= hi)
+    {
+        int middle = lo + (hi - lo) / 2;
+        if (x < arr[middle])        hi = middle - 1;
+        else if (x > arr[middle])   lo = middle + 1;
+        else                        return middle;
+    }
+    return -1; // Not found
+}
+// O(log(n) + count)
+int Count2(const vector<int>& arr, int x)
+{
+    const int n = arr.size();
+    int i = BinarySearch(arr, 0, n - 1, x); // 이진탐색으로 아무거나 하나 찾음, O(log(n))
+
+    if (i == -1) return 0; // 하나도 없다면 0개 반환
+
+    // 정렬된 상태라는 것을 이용
+
+    int count = 1; // 여기까지 왔다면 하나는 찾았음
+    int left = i - 1; // 왼쪽(인덱스가 작은쪽)으로 가면서 이웃하는 개수 세기
+    while (left >= 0 && arr[left] == x)
+    {
+        count++;
+        left--;
+    }
+
+    int right = i + 1; // 오른쪽(인덱스가 큰 쪽)으로 가면서 세기
+    while (right < n && arr[right] == x)
+    {
+        count++;
+        right++;
+    }
+
+    return count;
+}
+
+// # mine
 /**
  * target이랑 일치하는 값을 가진 위치 중 가장 왼쪽과 가장 오른쪽을 찾아서 둘의 차를 구한다.
  */
+/*
 int Count3(const vector<int>& arr, int target)
 {
 	//TODO: O(log(n))
@@ -112,6 +169,56 @@ int Count3(const vector<int>& arr, int target)
 		}
     }
     return (end - prev_start) + 1;
+}
+*/
+
+// # Honglab
+int FindFirst(const vector<int>& arr, int lo, int hi, int x);
+int FindLast(const vector<int>& arr, int low, int high, int x);
+
+int Count3(const vector<int>& arr, int x)
+{
+    // 정렬되어 있기 때문에 처음과 시작을 찾으면(=구간을 찾으면) 하나하나 세지 않아도 됩니다.
+    int first = FindFirst(arr, 0, arr.size() - 1, x); // 주의: 이진탐색의 변형
+
+    if (first == -1)
+        return 0;
+
+    int last = FindLast(arr, first, arr.size() - 1, x); // 주의: 이진탐색의 변형
+    return last - first + 1; // <- 생각해봅시다
+}
+
+int FindFirst(const vector<int>& arr, int lo, int hi, int x)
+{
+    // 이진탐색이 살짝 변형된 형태
+    if (hi >= lo)
+    {
+        int n = arr.size();
+        int mid = lo + (hi - lo) / 2;
+        if ((mid == 0 || x > arr[mid - 1]) && arr[mid] == x) // 첫번째를 찾아들어가기 위한 조건
+            return mid;
+        else if (x > arr[mid])
+            return FindFirst(arr, (mid + 1), hi, x);
+        else
+            return FindFirst(arr, lo, (mid - 1), x);
+    }
+    return -1;
+}
+
+int FindLast(const vector<int>& arr, int low, int high, int x)
+{
+    if (high >= low)
+    {
+        int n = arr.size();
+        int mid = (low + high) / 2;
+        if ((mid == n - 1 || x < arr[mid + 1]) && arr[mid] == x)
+            return mid;
+        else if (x < arr[mid])
+            return FindLast(arr, low, (mid - 1), x);
+        else
+            return FindLast(arr, (mid + 1), high, x);
+    }
+    return -1;
 }
 
 int main()
