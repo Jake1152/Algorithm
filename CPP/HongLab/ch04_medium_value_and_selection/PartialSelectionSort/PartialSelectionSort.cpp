@@ -45,7 +45,7 @@ void PartialSelectionSort(vector<int>& arr, int k)
 	for (int i = 0; i < k; i++)
 	{
 		// SelectionSortPass( TODO: );
-		SelectionSortPass(arr, i, arr.size() - 1);
+		SelectionSortPass(arr, i, arr.size());
 		Print(arr);
 	}
 }
@@ -55,7 +55,7 @@ int main()
 	// vector<int> my_vector = { 7, 10, 4, 3, 20, 15 };
 	random_device rd;
 	mt19937 gen(rd());
-	
+
 	const int n = 20;
 	vector<int> my_vector(n);
 	
