@@ -2,6 +2,7 @@
 #include <vector>
 #include <iostream>
 #include <assert.h>
+#include <cmath>
 
 using namespace std;
 
@@ -84,17 +85,31 @@ string KaratsubaHelper(string str1, string str2, int level) // level은 디버�
 	std::cout << "a : " << a << ",\tb : " << b << ",\tc : " << c << ",\td : " << d << "\n" << std::endl;
 	string ac = KaratsubaHelper(a, c, level + 1);
 	// TODO:
+	string bd = KaratsubaHelper(b, d, level + 1);
+	string z = KaratsubaHelper(Add(a, b), Add(c, d), level + 1);
+	string temp = Subtract(z, Add(ac, bd));
 
 	// 문자열 뒤에 '0'을 추가해서 10^N를 O(N)으로 처리
-	ac.append(string((N - mid) * 2, '0'));
+	ac.append(string((N - mid) * 2,'0'));
+	// ac.append(string(N, '0'));
+	temp.append(string((N - mid), '0'));
+	// temp.append(string((mid), '0'));
+	string result = Add(Add(ac, temp), bd);
+	/* 아래 3가지랑 ac.append(string((N - mid) * 2, '0')); 같은데 왜 복잡하게 표현되어 있는가?, 차이점이란?
+	  - (N - N/2) * 2가 다를 수 있다.
+	  - N=1, (1 - 0) * 2 => 2
+	  -      N => 1
+		ac.append(string((N - N/2) * 2, '0'));
+		ac.append(string((N/2) * 2, '0'));
+		ac.append(string(N, '0'));
+	*/
 	// TODO: ...
 	std::cout << "ac : " << ac << std::endl;
+	std::cout << "bd : " << bd << std::endl;
+
 
 	// 12 * 56
-	// (1 * (10 ** 1)) * (5 * (10 ** 1))
-	// 500
 
-	// string result = TODO;
 
 	// 디버깅 참고 (저는 하나하나 다 출력해보면서 디버깅합니다.)
 	int ai = stoi(a);
@@ -104,12 +119,16 @@ string KaratsubaHelper(string str1, string str2, int level) // level은 디버�
 	int tempi = ai * di + bi * ci;
 	cout << "Ref " << str1 << " x " << str2 << " = "
 		<< ai * ci << " + " << tempi << " + " << bi * di << " = " << ai * ci + tempi + bi * di << endl;
-	// cout << "Result " << str1 << " x " << str2 << " = "
-	// 	<< ac << " + " << tempi << " + " << bd << " = " << result << endl;
+	// (1 * (10 ** 1)) * (5 * (10 ** 1))
+	// resultLL += (a + b)(c + d) - (ac + bd);
+	// 500
+
+	cout << "Result " << str1 << " x " << str2 << " = "
+		<< ac << " + " << tempi << " + " << bd << " = " << result << endl;
 	// 주의: int 범위를 넘어가는 큰 숫자에 대해서는 사용할 수 없음
 	// assert(stoi(result) == stoi(str1) * stoi(str2));
 
-	return string("0"); // return result;
+	return result; // return result;
 }
 
 string Karatsuba(string str1, string str2)
