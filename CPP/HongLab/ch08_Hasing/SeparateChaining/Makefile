@@ -1,6 +1,6 @@
 NAME = SeparateChaining
 CXX = g++
-CXXFLAGS = -g -std=c++11 #-Wall -Wextra -Werror
+CXXFLAGS = -g -fpermissive #-Wall -Wextra -Werror
 RM = rm -f
 
 SRCS = SeparateChaining.cpp

@@ -9,6 +9,38 @@
 #include <list>
 using namespace std;
 
+/**
+실행 예시
+난수를 사용하기 때문에 달라질 수 있습니다.
+
+0:
+1:
+2:
+3:
+4:
+5: (327, 1)->(120, 1)->
+6: (52, 1)->
+7: (76, 1)->(237, 1)->
+8: (330, 2)->(192, 1)-> // 생일이 330인 사람 2명
+9: (78, 1)->
+10: (240, 1)->(194, 1)->
+11: (264, 1)->
+12:
+13:
+14:
+15: (360, 1)->(61, 1)->(84, 1)->(107, 1)->
+16: (85, 1)->(269, 1)->
+17: (109, 1)->
+18:
+19: (341, 1)->(249, 1)->
+20:
+21: (320, 1)->
+22: (183, 1)->
+1
+50.62 % // 이론 추정치와 비슷합니다. 
+
+*/
+
 // Sedgewick Ch3.1 p.375
 template<typename T_KEY, typename T_VALUE>
 class SequentialSearch
@@ -28,6 +60,13 @@ public:
 		// 찾았는지 못 찾았는 지에 대한 대응을 호출한 쪽으로 넘기는 방식
 		// std::map, std::unordered_map에서는 iterator를 반환
 
+		// std::list<int>::iterator
+		// for (auto iter = this->list.begin(); iter != this->list.end(); iter++)
+		for (typename std::list<Node>::iterator iter = this->list.begin(); iter != this->list.end(); iter++)
+		{
+			if (iter->key == key)
+				return &(*iter);
+		}
 		// cout << key << " was not found." << endl;
 
 		return nullptr;
@@ -35,9 +74,12 @@ public:
 
 	void Insert(Node n)
 	{
-		// TODO: 키를 찾아봤는데 없으면 추가
-
 		// 이미 있을 경우에는 추가 X
+		if (this->Find(n.key))
+			return ;
+		
+		// TODO: 키를 찾아봤는데 없으면 추가
+		list.push_back(n);
 	}
 
 	void Reset()
@@ -76,13 +118,18 @@ public:
 	Node* Find(T_KEY k)
 	{
 		// TODO:
+		const int key = HashFunc(k);
 
-		return nullptr;
+		return st.at(key).Find(k);
 	}
 
 	void Insert(Node n)
 	{
 		// TODO:
+		if (this->Find(n.key))
+			return ;
+		const int key = HashFunc(n.key);
+		st[key].Insert(n);
 	}
 
 	void Reset()
