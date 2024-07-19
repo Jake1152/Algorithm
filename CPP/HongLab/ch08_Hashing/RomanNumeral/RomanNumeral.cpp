@@ -36,39 +36,51 @@ int RomanToInt(string s)
 	// TODO:
 	std::stack<int> st;
 	int temp_sum = 0;
+	int max_value = 0;
+	/**
 	for (int i = 0; i < s.length(); i++)
 	{
 		const char prev_char = s[i-1];
 		const char cur_char = s[i];
 
-		if (st.size() && m[cur_char] > m[st.top()])
+		if (st.size() && m[cur_char] > m[prev_char])
 		{
 			while (st.size())
-			{
+			{ 
 				temp_sum += m[st.top()];
 				st.pop();
 			}
 			cout << "# str : " << s[i] << " ,temp_sum : " << temp_sum << endl;
 			cout << "# m[cur_char] : " << m[cur_char] << endl;
-			ans += m[cur_char] - temp_sum;
+			if (temp_sum > m[cur_char])
+				ans += temp_sum + m[cur_char];
+			else 
+				ans += m[cur_char] - temp_sum;
 			temp_sum = 0;
 		}
 		else
 			st.push(s[i]);
+
+		// if (m[cur_char] > max_value)
+		// 	max_value = m[cur_char];
 	}
+	 */
+	
+    for (int i = 0; i < s.length(); i++)
+    {
+        if (m[s[i]] < m[s[i + 1]])
+        {
+            ans -= m[s[i]];
+        }
+        else
+        {
+            ans += m[s[i]];
+        }
+    }
 
-	// cout << s << " = " << ans << endl;
-	while (st.size())
-	{
-		const char cur_char = st.top();
+    cout << s << " = " << ans << endl;
 
-		st.pop();
-		ans += m[cur_char];
-	}
-
-	cout << s << " = " << ans << endl;
-
-	return ans;
+    return ans;
 }
 
 int main()
