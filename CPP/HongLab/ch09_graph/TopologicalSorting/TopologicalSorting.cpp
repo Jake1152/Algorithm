@@ -4,6 +4,8 @@
 #include <queue>
 #include <unordered_map>
 #include <map>
+#include <algorithm>
+
 using namespace std;
 
 struct Vertex
@@ -75,14 +77,31 @@ public:
 		cout << "OK" << endl;
 	}
 
+	/**
+	 * 위상정렬
+	 * 진입차수는 0
+	 * 
+	 * 진입차수가 0인 동안 계속 방문
+	 */
 	stack<Vertex*> TopologicalSort()
 	{
-		pre = queue<Vertex*>(); // 비교 용도
-		post = queue<Vertex*>(); // 비교 용도
-		revPost = stack<Vertex*>();
+		this->pre = queue<Vertex*>(); // 비교 용도
+		this->post = queue<Vertex*>(); // 비교 용도
+		this->revPost = stack<Vertex*>();
 
 		// TODO: 
+		// for (auto* v : this->vertices)
+        // 	v->visited = false;
+		
+		// Vertex *
+		for (typename std::vector<Vertex *>::reverse_iterator reverse_iter = this->vertices.rbegin(); reverse_iter != this->vertices.rend(); reverse_iter++)
+		{
+			Vertex *vertex = *reverse_iter;
 
+			if (vertex->in_neighbors.size() == 0 \
+				&& vertex->visited == false)
+				TopologicalSortHelper(vertex);
+		}
 		return revPost;
 	}
 
@@ -92,6 +111,43 @@ private:
 	void TopologicalSortHelper(Vertex* v)
 	{
 		//TODO: pre, post, revPost에 저장하기 
+		v->visited = true;
+		this->pre.push(v);
+
+		for (typename std::vector<Vertex *>::reverse_iterator reverse_iter = v->out_neighbors.rbegin(); reverse_iter != v->out_neighbors.rend(); reverse_iter++)
+		{
+			Vertex *vertex = *reverse_iter;
+
+			// vertex->in_neighbors.erase(remove(vertex->in_neighbors.begin(), vertex->in_neighbors.end(), v));
+			if (vertex->visited == false)
+				TopologicalSortHelper(vertex);
+		}
+		this->revPost.push(v);
+		this->post.push(v);
+		// v->out_neighbors
+		/**
+		 * 진출되는 노드들의 진입노드 백터에서 현재 노드룰 뺀다.
+		 * e.g)
+		 * 2 -> [3, 4]
+		 * 3, 4번 노드의 진입 노드 벡터에서 2번 노드를 제거한다.
+		 */
+		// for (typename std::vector<Vertex *>::iterator iter = v->out_neighbors.begin(); iter != v->out_neighbors.end(); iter++)
+		// {
+		// 	Vertex *vertex = *iter;
+
+		// 	vertex->in_neighbors.erase(remove(vertex->in_neighbors.begin(), vertex->in_neighbors.end(), v));
+		// }
+
+		// for (typename std::vector<Vertex *>::iterator iter = this->vertices.begin(); iter != this->vertices.end(); iter++)
+		// {
+		// 	Vertex *vertex = *iter;
+
+		// 	if (vertex->in_neighbors.size() == 0 \
+		// 		&& vertex->visited == false)
+		// 		TopologicalSortHelper(vertex);
+		// }
+		
+
 	}
 };
 
