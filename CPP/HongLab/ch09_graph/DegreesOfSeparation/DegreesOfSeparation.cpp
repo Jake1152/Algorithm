@@ -55,6 +55,7 @@ public:
 			v->visited = false;
 
 		vector<Vertex*> prev(vertices.size(), nullptr);
+		// vector<Vertex*> prev;
 
 		vertices[source]->visited = true;
 		queue<Vertex*> q;
@@ -75,7 +76,9 @@ public:
 					w->visited = true;
 					q.push(w);
 
-					// prev[TODO] = TODO
+					// prev[v->value] = w;
+					// prev.push_back(v);
+					// prev.insert()
 				}
 			}
 		}
@@ -84,6 +87,11 @@ public:
 
 		// TODO: prev를 이용해서 path 만들기
 		//       deque의 push_front() 사용
+		for (const auto vertex : prev)
+		{
+			if (vertex != nullptr)
+				path.push_front(vertex);
+		}
 
 
 		// 결과 출력 (숫자만)
