@@ -76,9 +76,7 @@ public:
 					w->visited = true;
 					q.push(w);
 
-					// prev[v->value] = w;
-					// prev.push_back(v);
-					// prev.insert()
+					prev[w->value] = v;
 				}
 			}
 		}
@@ -91,13 +89,20 @@ public:
 		0 -> 2 // 최단 경로
 		 */
 		deque<Vertex*> path;
-
 		// TODO: prev를 이용해서 path 만들기
 		//       deque의 push_front() 사용
-		for (const auto vertex : prev)
+		// for (const auto vertex : prev)
+		// for (Vertex iter = prev.begin())
+		for (size_t idx = 0; idx < prev.size(); idx++)
 		{
-			if (vertex != nullptr)
-				path.push_front(vertex);
+			if (prev[idx] == nullptr)
+				path.push_front(this->vertices[idx]);
+			else
+				path.push_front(prev[idx]);
+			// if (vertex == nullptr)
+			// 	continue ;
+			// cout << "vertex->value : " << vertex->value << endl;
+			// if (vertex != nullptr)
 		}
 
 
