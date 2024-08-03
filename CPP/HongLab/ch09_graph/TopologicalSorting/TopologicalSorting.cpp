@@ -80,7 +80,6 @@ public:
 	/**
 	 * 위상정렬
 	 * 진입차수는 0
-	 * 
 	 * 진입차수가 0인 동안 계속 방문
 	 */
 	stack<Vertex*> TopologicalSort()

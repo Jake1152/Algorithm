@@ -82,7 +82,14 @@ public:
 				}
 			}
 		}
+		/**
+		0 -> 1
+		0 -> 2
+		1 -> 2
 
+		0->1->2
+		0 -> 2 // 최단 경로
+		 */
 		deque<Vertex*> path;
 
 		// TODO: prev를 이용해서 path 만들기
@@ -134,6 +141,14 @@ int main()
 		g.AddDiEdge(1, 2); // 메인요리 -> 디저트
 		g.AddDiEdge(0, 2); // 애피타이저 -> 디저트
 
+		/**
+		0 -> 1
+		0 -> 2
+		1 -> 2
+
+		0->1->2
+		0 -> 2 // 최단 경로
+		 */
 		// 디저트->애피타이저 X, 싸이클이 생기기 때문
 
 		g.BreadthFirstPaths(0, 2);
@@ -150,6 +165,17 @@ int main()
 		g.AddDiEdge(2, 3);
 		g.AddDiEdge(3, 1);
 
+		/**
+		 * 5 -> 2
+		 * 5 -> 0
+		 * 4 -> 0
+		 * 4 -> 1
+		 * 2 -> 3
+		 * 3 -> 1
+		 * 
+		 * 5->2->3->1
+		 * 4->1
+		 */
 		g.BreadthFirstPaths(5, 4);
 		g.BreadthFirstPaths(5, 0);
 	}
