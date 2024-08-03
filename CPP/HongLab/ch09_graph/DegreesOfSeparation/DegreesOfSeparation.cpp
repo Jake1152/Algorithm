@@ -75,7 +75,6 @@ public:
 				{
 					w->visited = true;
 					q.push(w);
-
 					prev[w->value] = v;
 				}
 			}
@@ -88,23 +87,22 @@ public:
 		0->1->2
 		0 -> 2 // 최단 경로
 		 */
-		deque<Vertex*> path;
-		// TODO: prev를 이용해서 path 만들기
-		//       deque의 push_front() 사용
-		// for (const auto vertex : prev)
-		// for (Vertex iter = prev.begin())
-		for (size_t idx = 0; idx < prev.size(); idx++)
-		{
-			if (prev[idx] == nullptr)
-				path.push_front(this->vertices[idx]);
-			else
-				path.push_front(prev[idx]);
-			// if (vertex == nullptr)
-			// 	continue ;
-			// cout << "vertex->value : " << vertex->value << endl;
-			// if (vertex != nullptr)
-		}
 
+		deque<Vertex*> path;
+		if (prev[sink])
+			path.push_front(vertices[sink]);
+		else
+			cout << "No path found" << endl;
+
+		/**
+		* 종점부터 시작해서 이전 지점들을 push_front를 이용해서 기록한다.
+		*/
+		Vertex* p = prev[sink];
+		while (p != nullptr)
+		{
+			path.push_front(p);
+			p = prev[p->value];
+		}
 
 		// 결과 출력 (숫자만)
 		for (auto* v : path) {
