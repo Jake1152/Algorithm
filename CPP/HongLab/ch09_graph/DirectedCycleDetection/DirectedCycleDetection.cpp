@@ -1,86 +1,50 @@
 #include <iostream>
 #include <vector>
-#include <string>
-#include <unordered_map>
+#include <stack>
+#include <algorithm>
 using namespace std;
 
 struct Vertex
 {
-	Vertex(string k, int i)
-	{
-		key = k;
-		index = i;
-	}
+	Vertex(int v) { index = v; }
 
-	string key = "";
-	int index = -1;  // 이 Vertex의 포인터가 저장된 vertices 배열의 인덱스
+	int index = -1; // 덜 헷갈리기 위해 value를 index로 변경
 	bool visited = false;
 
-	vector<Vertex*> out_neighbors;
+	vector<Vertex*> out_neighbors; // 나가는 방향의 이웃 vertex들에 대한 포인터
 };
 
-class SymbolGraph
+class Graph
 {
 public:
-	SymbolGraph(vector<string> keys)
+	Graph(int num_vertices)
 	{
-		this->table.clear();
-		this->vertices.clear();
-		this->vertices.reserve(keys.size());
-
-
-		// TODO: vertices와 table 초기화
-		// index는 keys에 들어오는 순서대로인가 아니면 'A' ~ 'Z' 사이의 알파벳 순서인가?
-		for (size_t idx = 0; idx < keys.size(); idx++) {
-			this->table.insert({keys[idx], idx});
-			// this->table.insert(std::make_pair(keys[idx], idx));
-			this->vertices.push_back(new Vertex(keys[idx], idx));
-		}
-
-		// 확인용
-		for (auto v : this->vertices)
-			cout << v->key << " " << v->index << endl;
-		for (auto i : this->table)
-			cout << i.first << " " << i.second << endl;
+		vertices.resize(num_vertices);
+		for (int i = 0; i < num_vertices; i++)
+			vertices[i] = new Vertex(i);
 	}
 
-	~SymbolGraph()
+	~Graph()
 	{
-		for (auto* v : this->vertices)
+		for (auto* v : vertices)
 			delete v;
 	}
 
-	void AddDiEdge(string kv, string kw)
+	void AddDiEdge(int v, int w)
 	{
-		// TODO: table 이용
-		// g.AddDiEdge("F", "B");
-		// g.AddDiEdge("F", "G");
-
-		// this->table.find(rv);
-		
-		// 
-		/** 틀린 이유*/
-		// this->vertices[this->table[kv]]->out_neighbors.push_back(new Vertex(kw, this->table[kw]));
-		// 정답
-		this->vertices[this->table[kv]]->out_neighbors.push_back(this->vertices[this->table[kw]]);
-		// honglab way
-		// AddDiEdge(table[kv], table[kw]);
+		vertices[v]->out_neighbors.push_back(vertices[w]);
 	}
 
-	void AddDiEdge(int v, int w) // 단방향 간선
+	void AddBiEdge(int v, int w)
 	{
-		this->vertices[v]->out_neighbors.push_back(vertices[w]);
-	}
-
-	void DFS(string k)
-	{
-		// TODO: table 이용
-		DFS(this->table[k]);
+		vertices[v]->out_neighbors.push_back(vertices[w]);
+		vertices[w]->out_neighbors.push_back(vertices[v]);
 	}
 
 	void DFS(int source)
 	{
-		for (auto* v : this->vertices)
+		cout << "Depth-first Search: ";
+		for (auto* v : vertices)
 			v->visited = false;
 		DFS(vertices[source]);
 		cout << endl;
@@ -88,39 +52,123 @@ public:
 
 	void DFS(Vertex* source)
 	{
+		cout << source->index << " ";
 		source->visited = true;
-
-		// Preorder
-		// cout << source->key << " ";
-
 		for (auto* w : source->out_neighbors)
 			if (!w->visited)
 				DFS(w);
+	}
 
-		// Postorder
-		cout << source->key << " ";
+	void DetectCycle()
+	{
+		prev.resize(vertices.size(), nullptr);
+		on_stack.resize(vertices.size(), false);
+		cycle.clear();
+
+		for (auto* v : vertices)
+			v->visited = false;
+
+		for (auto* v : vertices)
+		{
+			DetectCycle(v);
+
+			if (!cycle.empty()) {
+				cout << "Cycle detected" << endl;
+				PrintCycle(cycle); // 출력할 때 역순으로 출력합니다.
+				return; // 싸이클을 하나라도 발견시 종료
+			}
+		}
+
+		if (cycle.empty())
+			cout << "No cycle detected" << endl;
+	}
+
+	void DetectCycle(Vertex* v)
+	{
+		v->visited = true;
+		on_stack[v->index] = true; // 재귀호출 스택에 쌓인 상태 (재귀호출이 끝나지 않은 상태)
+
+		// 디버깅용 출력 (재귀호출 스택에 쌓여있는 상황)
+		cout << "On stack: ";
+		for (int i = 0; i < on_stack.size(); i++)
+			if (on_stack[i])
+				cout << i << " ";
+		cout << endl;
+
+		for (auto* w : v->out_neighbors)
+		{
+			if (!cycle.empty())
+				return;
+			else if (!w->visited)
+			{
+				// TODO: prev[TODO] = TODO; // Kevin Bacon 예제 복습
+
+				DetectCycle(w);
+			}
+			//else if ( TODO ) // 싸이클 발견!
+			//{
+			//	cout << "Cycle detected: " << w->index << endl;
+
+			//	// TODO: 싸이클 저장, 이것도 Kevin Bacon 예제 복습
+			//}
+		}
+
+		on_stack[v->index] = false; // 재귀호출이 곧 끝난다는 것을 표기
 	}
 
 private:
 	vector<Vertex*> vertices;
+	vector<Vertex*> cycle; // 싸이클이 발견되면 여기에 저장
+	vector<Vertex*> prev;  // 이전에 방문한 정점 기록용
+	vector<bool> on_stack; // 현재 재귀호출 스택에 들어가 있는 상태인지
 
-	unordered_map<string, int> table; // key -> index
+	void PrintCycle(vector<Vertex*> cycle)
+	{
+		std::reverse(cycle.begin(), cycle.end());
+		for (auto& v : cycle) {
+			cout << v->index;
+			if (&v != &cycle.back())
+				cout << " -> ";
+		}
+		cout << endl;
+	}
 };
 
 int main()
 {
-	SymbolGraph g({ "A", "B", "C", "D", "E", "F", "G", "H", "I" });
+	// 한 경로 안에서 한 번 방문한 정점은 다시 방문하지 않는다.
 
-	g.AddDiEdge("F", "B");
-	g.AddDiEdge("F", "G");
-	g.AddDiEdge("B", "A");
-	g.AddDiEdge("B", "D");
-	g.AddDiEdge("D", "C");
-	g.AddDiEdge("D", "E");
-	g.AddDiEdge("G", "I");
-	g.AddDiEdge("I", "H");
+	// 간단한 경우
+	{
+		// 0: 애피타이저
+		// 1: 메인요리
+		// 2: 디저트
 
-	g.DFS("F");
+		Graph g(3);
+		g.AddDiEdge(0, 1); // 애피타이저 -> 메인요리
+		g.AddDiEdge(1, 2); // 메인요리 -> 디저트
+		//g.AddDiEdge(0, 2); // 애피타이저 -> 디저트
+		g.AddDiEdge(2, 0); // 디저트 -> 애피타이저 싸이클 생성
+
+		//g.DFS(0);
+		g.DetectCycle();
+	}
+
+	// Sedgewick Algorithm 4.1 p.536 (조금 달라요)
+	{
+		Graph g(6);
+
+		g.AddDiEdge(0, 2);
+		g.AddDiEdge(2, 1);
+		g.AddDiEdge(2, 3);
+		g.AddDiEdge(3, 4);
+		g.AddDiEdge(1, 5);
+		g.AddDiEdge(2, 4);
+		g.AddBiEdge(0, 5); // 싸이클 생성
+
+		//g.DFS(2);
+		g.DetectCycle();
+	}
 
 	return 0;
 }
