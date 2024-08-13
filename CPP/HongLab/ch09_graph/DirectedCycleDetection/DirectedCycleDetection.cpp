@@ -19,34 +19,37 @@ class Graph
 public:
 	Graph(int num_vertices)
 	{
-		vertices.resize(num_vertices);
+		this->vertices.resize(num_vertices);
 		for (int i = 0; i < num_vertices; i++)
-			vertices[i] = new Vertex(i);
+			this->vertices[i] = new Vertex(i);
 	}
 
 	~Graph()
 	{
-		for (auto* v : vertices)
+		for (auto* v : this->vertices)
+		{
 			delete v;
+			v = nullptr;
+		}
 	}
 
 	void AddDiEdge(int v, int w)
 	{
-		vertices[v]->out_neighbors.push_back(vertices[w]);
+		this->vertices[v]->out_neighbors.push_back(this->vertices[w]);
 	}
 
 	void AddBiEdge(int v, int w)
 	{
-		vertices[v]->out_neighbors.push_back(vertices[w]);
-		vertices[w]->out_neighbors.push_back(vertices[v]);
+		this->vertices[v]->out_neighbors.push_back(this->vertices[w]);
+		this->vertices[w]->out_neighbors.push_back(this->vertices[v]);
 	}
 
 	void DFS(int source)
 	{
 		cout << "Depth-first Search: ";
-		for (auto* v : vertices)
+		for (auto* v : this->vertices)
 			v->visited = false;
-		DFS(vertices[source]);
+		DFS(this->vertices[source]);
 		cout << endl;
 	}
 
@@ -61,14 +64,14 @@ public:
 
 	void DetectCycle()
 	{
-		prev.resize(vertices.size(), nullptr);
-		on_stack.resize(vertices.size(), false);
-		cycle.clear();
+		this->prev.resize(this->vertices.size(), nullptr);
+		this->on_stack.resize(this->vertices.size(), false);
+		this->cycle.clear();
 
-		for (auto* v : vertices)
+		for (auto* v : this->vertices)
 			v->visited = false;
 
-		for (auto* v : vertices)
+		for (auto* v : this->vertices)
 		{
 			DetectCycle(v);
 
@@ -86,7 +89,7 @@ public:
 	void DetectCycle(Vertex* v)
 	{
 		v->visited = true;
-		on_stack[v->index] = true; // 재귀호출 스택에 쌓인 상태 (재귀호출이 끝나지 않은 상태)
+		this->on_stack[v->index] = true; // 재귀호출 스택에 쌓인 상태 (재귀호출이 끝나지 않은 상태)
 
 		// 디버깅용 출력 (재귀호출 스택에 쌓여있는 상황)
 		cout << "On stack: ";
@@ -102,15 +105,20 @@ public:
 			else if (!w->visited)
 			{
 				// TODO: prev[TODO] = TODO; // Kevin Bacon 예제 복습
+				this->prev[w->index] = v;
 
 				DetectCycle(w);
 			}
-			//else if ( TODO ) // 싸이클 발견!
-			//{
-			//	cout << "Cycle detected: " << w->index << endl;
+			else if (this->prev[w->index] == v) // 싸이클 발견!
+			{
+				cout << "Cycle detected: " << w->index << endl;
 
-			//	// TODO: 싸이클 저장, 이것도 Kevin Bacon 예제 복습
-			//}
+				// TODO: 싸이클 저장, 이것도 Kevin Bacon 예제 복습
+				for (auto x : prev)
+					if (x)
+						cout << "x->index " << x->index << endl;
+				this->cycle.push_back(w);
+			}
 		}
 
 		on_stack[v->index] = false; // 재귀호출이 곧 끝난다는 것을 표기
