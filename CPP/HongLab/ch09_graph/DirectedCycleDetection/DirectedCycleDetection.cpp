@@ -109,15 +109,22 @@ public:
 
 				DetectCycle(w);
 			}
-			else if (this->prev[w->index] == v) // 싸이클 발견!
+			// this->on_stack[w->index] on_stack 
+			else if (this->on_stack[w->index]) // 싸이클 발견!
 			{
 				cout << "Cycle detected: " << w->index << endl;
 
 				// TODO: 싸이클 저장, 이것도 Kevin Bacon 예제 복습
-				for (auto x : prev)
-					if (x)
-						cout << "x->index " << x->index << endl;
+				// for (auto x : prev)
+				for (auto x = v; x != w; x = prev[x->index])
+				{
+					this->cycle.push_back(x);
+					// this->cycle.push_back(prev[x->index]);
+					cout << "x->index " << x->index << endl;
+					// cout << "prev[x->index]->index " << prev[x->index]->index << endl;
+				}
 				this->cycle.push_back(w);
+				this->cycle.push_back(v); // v는 이전 노드
 			}
 		}
 
