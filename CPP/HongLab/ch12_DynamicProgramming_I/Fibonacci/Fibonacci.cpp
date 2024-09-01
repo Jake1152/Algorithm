@@ -43,9 +43,10 @@ int BottomUpFibonacciTabulation(int n)
 	table[0] = 0;
 	table[1] = 1;
 
-	// for ( TODO )
+	for (int idx = 2; idx <= n; idx++)
 	{
 		// TODO:
+		table[idx] = table[idx - 2] + table[idx - 1];
 
 		for (auto& t : table) cout << setw(4) << t; cout << endl;
 	}
@@ -73,9 +74,9 @@ int main()
 
 	// cout << RecurFibonacci(n) << endl;
 
-	cout << MemoizedTopDownFibonacci(n) << endl;
+	// cout << MemoizedTopDownFibonacci(n) << endl;
 
-	// cout << BottomUpFibonacciTabulation(n) << endl;
+	cout << BottomUpFibonacciTabulation(n) << endl;
 
 	// cout << BottomUpFibonacci(n) << endl;
 
