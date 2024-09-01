@@ -7,6 +7,13 @@ using namespace std;
 
 // CLRS 4판 14.1 Rod Cutting
 
+/**
+ * 현재 길이를 구성하는 조합들 중 가장 큰 가격은 얼마인가?
+ * 길이 7인 것은
+ *  7 1개, 6 + 1, 5 + 1 + 1, 5 + 2 ... 등으로 표현 가능하다
+ *  5+1은 6에서 알수 있고, 5 + 2의 경우 역시나 5가 6에 포함되니까 5+2까지 안가도 되지 않을까 싶다.
+ * 직전 것만 바라본다!
+ */
 int RecurCutRod(const vector<int>& prices, int length)
 {
 	if (length == 0)
@@ -17,6 +24,7 @@ int RecurCutRod(const vector<int>& prices, int length)
 	for (int i = 1; i <= length; i++)
 	{
 		// TODO:
+		max_price = max(RecurCutRod(prices, length - 1) + RecurCutRod(prices, 1), max(prices[i], max_price));
 	}
 
 	return max_price;
@@ -86,20 +94,20 @@ int main()
 	}
 	cout << endl;
 
-	cout << "TopDown with Memoization" << endl;
-	cout << "Optimal revenue for length " << 10 << ": " << MemoizedCutRod(price_table, 10) << endl;
-	cout << endl;
+	// cout << "TopDown with Memoization" << endl;
+	// cout << "Optimal revenue for length " << 10 << ": " << MemoizedCutRod(price_table, 10) << endl;
+	// cout << endl;
 
-	cout << "BottomUpTabulation" << endl;
-	cout << "Optimal revenue for length " << 10 << ": " << BottomUpCutRod(price_table, 10) << endl;
-	cout << endl;
+	// cout << "BottomUpTabulation" << endl;
+	// cout << "Optimal revenue for length " << 10 << ": " << BottomUpCutRod(price_table, 10) << endl;
+	// cout << endl;
 
-	for (int length = 0; length < price_table.size(); length++)
-	{
-		cout << "Length: " << length << endl;
-		int revenue = ExtendedBottomUpCutRod(price_table, length);
-		cout << "Optimal revenue: " << revenue << endl;
-	}
+	// for (int length = 0; length < price_table.size(); length++)
+	// {
+	// 	cout << "Length: " << length << endl;
+	// 	int revenue = ExtendedBottomUpCutRod(price_table, length);
+	// 	cout << "Optimal revenue: " << revenue << endl;
+	// }
 
 	return 0;
 }
