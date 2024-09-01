@@ -17,9 +17,11 @@ int RecurFibonacci(int n)
 int MemoizedTopDownFibonacciHelper(int n, std::vector<int>& memo)
 {
 	// TODO:
+	if (memo.at(n) == -1)
+		memo[n] = MemoizedTopDownFibonacciHelper(n - 2, memo) + MemoizedTopDownFibonacciHelper(n - 1, memo);
 
-	for (auto& t : memo) cout << setw(4) << t; cout << endl;
-
+	for (auto& t : memo)
+		cout << setw(4) << t; cout << endl;
 	return memo[n];
 }
 
@@ -69,13 +71,13 @@ int main()
 {
 	int n = 7; // 숫자가 크면 단순 재귀 버전은 많이 느립니다.
 
-	cout << RecurFibonacci(n) << endl;
+	// cout << RecurFibonacci(n) << endl;
 
 	cout << MemoizedTopDownFibonacci(n) << endl;
 
-	cout << BottomUpFibonacciTabulation(n) << endl;
+	// cout << BottomUpFibonacciTabulation(n) << endl;
 
-	cout << BottomUpFibonacci(n) << endl;
+	// cout << BottomUpFibonacci(n) << endl;
 
 	return 0;
 }
