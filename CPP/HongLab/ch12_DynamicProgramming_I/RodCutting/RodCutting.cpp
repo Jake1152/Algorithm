@@ -23,8 +23,8 @@ int RecurCutRod(const vector<int>& prices, int length)
 
 	for (int i = 1; i <= length; i++)
 	{
-		// TODO:
-		max_price = max(RecurCutRod(prices, length - 1) + RecurCutRod(prices, 1), max(prices[i], max_price));
+		// TODO: 각 조각에 대한 최적화된 값을 찾아나아간다.
+		max_price = max(max_price, prices[i] + RecurCutRod(prices, length - i));
 	}
 
 	return max_price;
@@ -35,7 +35,13 @@ int MemoizedCutRodHelper(const vector<int>& prices, int length, vector<int>& mem
 	if (memo[length] >= 0)
 		return memo[length];
 
+	int max_price = numeric_limits<int>::min();
 	// TODO:
+	for (int idx = 1; idx <= length; idx++)
+	{
+		max_price = max(max_price, prices[idx] + MemoizedCutRodHelper(prices, length - idx, memo));
+	}
+	memo[length] = max_price;
 
 	for (auto& t : memo) cout << setw(3) << t; cout << endl;
 
@@ -94,9 +100,9 @@ int main()
 	}
 	cout << endl;
 
-	// cout << "TopDown with Memoization" << endl;
-	// cout << "Optimal revenue for length " << 10 << ": " << MemoizedCutRod(price_table, 10) << endl;
-	// cout << endl;
+	cout << "TopDown with Memoization" << endl;
+	cout << "Optimal revenue for length " << 10 << ": " << MemoizedCutRod(price_table, 10) << endl;
+	cout << endl;
 
 	// cout << "BottomUpTabulation" << endl;
 	// cout << "Optimal revenue for length " << 10 << ": " << BottomUpCutRod(price_table, 10) << endl;
