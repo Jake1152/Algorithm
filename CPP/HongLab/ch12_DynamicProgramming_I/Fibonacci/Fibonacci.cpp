@@ -64,7 +64,13 @@ int BottomUpFibonacci(int n)
 	int b = 1;
 
 	// TODO:
+	for (int count = 2; count <= n; count++)
+	{
+		int prev_b = b;
 
+		b = a + b;
+		a = prev_b;
+	}
 	return b; // The N-th Fibonacci number
 }
 
@@ -78,7 +84,7 @@ int main()
 
 	cout << BottomUpFibonacciTabulation(n) << endl;
 
-	// cout << BottomUpFibonacci(n) << endl;
+	cout << BottomUpFibonacci(n) << endl;
 
 	return 0;
 }
