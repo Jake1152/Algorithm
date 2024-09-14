@@ -29,7 +29,10 @@ public:
 	~Graph()
 	{
 		for (auto* v : vertices)
+		{
 			delete v;
+			v = nullptr;  // for (auto* v : vertices) 이런 형태 반복문에서도 값의 변경이 될 것인가? call by ref인가?
+		}
 	}
 
 	//void AddDiEdge(int v, int w) // 단방향 간선
@@ -43,30 +46,47 @@ public:
 		vertices[w]->out_neighbors.push_back(vertices[v]);
 	}
 
+	/**
+	 * this->id는 현재 DFS로 탐색 중인 경로들, 갈 수 있는 모든 곳
+	 */
 	void DFS(Vertex* v)
 	{
+		if (v == nullptr)
+			return ;
 		// TODO:
+		this->id[v->value] = this->count;
+		v->visited = true;
+		for (Vertex *out_neighbor : v->out_neighbors)
+		{
+			if (out_neighbor->visited == false)
+				DFS(out_neighbor);
+		}
 	}
 
 	void ConnectedComponents()
 	{
-		count = 0;
-		id.resize(vertices.size(), -1);
+		this->count = 0;
+		this->id.resize(this->vertices.size(), -1);
 
-		// TODO:
-
-		// 결과 정리 후 출력
-		//vector<vector<int>> components(count);
-		//for (int s = 0; s < vertices.size(); s++)
-		//	components[id[s]].push_back(s);
-		//cout << count << " components" << endl;
-		//for (int i = 0; i < components.size(); i++)
-		//{
-		//	cout << "Component " << i + 1 << ": ";
-		//	for (auto v : components[i])
-		//		cout << v << " ";
-		//	cout << endl;
-		//}
+		for (auto* v : vertices)
+		{
+			if (v->visited == false)
+			{
+				this->DFS(v);
+				this->count++;
+			}
+		}
+		vector<vector<int>> components(count);
+		for (int s = 0; s < vertices.size(); s++)
+			components[id[s]].push_back(s);
+		cout << count << " components" << endl;
+		for (int i = 0; i < components.size(); i++)
+		{
+			cout << "Component " << i + 1 << ": ";
+			for (auto v : components[i])
+				cout << v << " ";
+			cout << endl;
+		}
 	}
 
 private:
