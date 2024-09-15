@@ -40,30 +40,51 @@ public:
 
 	bool HasPath(int start, int target)
 	{
-		for (auto* v : vertices)
+		for (auto* v : this->vertices)
 			v->visited = false;
-		return HasPathHelper(vertices[start], vertices[target]);
+		return HasPathHelper(this->vertices[start], this->vertices[target]);
 	}
 
+	/**
+	 * 1 -> 4번이 연결되었는지, 확인
+	 * 1에서 4번으로 연결 되었는지(연결이 되었건, 아니건) 
+	 * 확인되었다면, 
+	 * 4 -> 1번으로 연결되었는지는 확인 필요
+	 */
 	void BruteForceStrongComponents()
 	{
 		int count = 0;
 		vector<int> id(vertices.size(), -1);
 
 		// TODO: HasPath()를 이용해서 서로 강하게 연결된 요소들을 찾습니다.
+		/**
+		 * 각 노드에서 전부 강한 연결이 되는지 확인해본다.
+		 */
+		for (const auto v : this->vertices)
+		{
+			for (const auto neighbor : v->in_neighbors)
+			{
+				std::cout << "neighbor->value : " << neighbor->value << std::endl;
+				std::cout << "#count : " << count << std::endl;
+				if (HasPath(v->value, neighbor->value) == true);
+					count++;
+				std::cout << std::endl;
+			}
+		}
+		std::cout << "count : " << count << std::endl;
 
 		// 결과 정리 후 출력
-		//vector<vector<int>> components(count);
-		//for (int s = 0; s < vertices.size(); s++)
-		//	components[id[s]].push_back(s);
-		//cout << count << " strong components" << endl;
-		//for (int i = 0; i < components.size(); i++)
-		//{
-		//	cout << "Strong component " << i + 1 << ": ";
-		//	for (auto v : components[i])
-		//		cout << v << " ";
-		//	cout << endl;
-		//}
+		// vector<vector<int>> components(count);
+		// for (int s = 0; s < vertices.size(); s++)
+		// 	components[id[s]].push_back(s);
+		// cout << count << " strong components" << endl;
+		// for (int i = 0; i < components.size(); i++)
+		// {
+		// 	cout << "Strong component " << i + 1 << ": ";
+		// 	for (auto v : components[i])
+		// 		cout << v << " ";
+		// 	cout << endl;
+		// }
 	}
 
 private:
@@ -72,7 +93,16 @@ private:
 	bool HasPathHelper(Vertex* v, Vertex* t)
 	{
 		// TODO: DFS 방식으로 v와 t가 만날 수 있는 지를 확인합니다.
-
+		v->visited = true;
+		std::cout << "source : " << v->value << std::endl;
+		std::cout << "target : " << t->value << std::endl;
+		if (v->value == t->value)
+			return true;
+		for (const auto neighbor : v->out_neighbors)
+		{
+			if (neighbor->visited == false)
+				return HasPathHelper(neighbor, t);
+		}
 		return false;
 	}
 };
