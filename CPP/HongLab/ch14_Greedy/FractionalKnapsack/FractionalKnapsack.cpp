@@ -47,23 +47,19 @@ double FractionalKnapsack(vector<Item> items, double W)
 	 * 가치 6짜리 아이템의 무게가 2일 때
 	 * 무게 1을 가져오고 가치 3을 얻을 수 있다.
 	 */
-	for (auto& i : items)
-	{
-		// TODO:
-		/**
-		 * min(현재 베낭 남은 무게, 아이템 무게)
-		 * 몫 * 가치 
-		 */
-		if (W <= 0)
-			break ;
-		const size_t available_weight = min(W, i.weight);
-		std::cout << "W : " << W << std::endl;
-		W -= available_weight;
-		std::cout << "available_weight : " << available_weight << std::endl;
-		const double ratio_item = i.value / i.weight;
-		vsum += ratio_item * available_weight;
-	}
+    for (auto& i : items)
+    {
+        double take = std::min(W, i.weight);
+        W -= take;
+        vsum += take * i.value / i.weight;
 
+        // Trace (진행 과정 출력)
+        i.weight -= take;
+        cout << "W = " << W << ", vsum = " << vsum << endl;
+        Print(items);
+
+        if (W <= 0.0) break;
+    }
 	return vsum;
 }
 
