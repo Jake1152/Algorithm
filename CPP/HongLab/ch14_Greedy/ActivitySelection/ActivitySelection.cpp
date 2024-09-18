@@ -54,10 +54,14 @@ vector<Activity> GreedyActivitySelection(vector<Activity>& activities)
 	vector<Activity> schedule;
 
 	// TODO:
-	const int current_time = 0;
-	for (const auto activity : activities)
+	int current_time = 0;
+	for (auto activity : activities)
 	{
-		current_time = activity.end();
+		if (current_time <= activity.start)
+		{
+			schedule.push_back(activity);
+			current_time = activity.end;
+		}
 	}
 
 	return schedule;
