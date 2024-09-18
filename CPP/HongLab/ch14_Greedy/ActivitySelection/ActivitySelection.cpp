@@ -44,28 +44,27 @@ void Print(vector<Activity>& activities)
 	cout << endl;
 }
 
-// 종료시간이 빠른 것을 고르고 다음 종료시간이 빠른 일정의 시작시간이 현재시간보다 늦다면 선택
 vector<Activity> GreedyActivitySelection(vector<Activity>& activities)
 {
-	sort(activities.begin(), activities.end(), Compare);
+    sort(activities.begin(), activities.end(), Compare);
 
-	Print(activities);
+    Print(activities);
 
-	vector<Activity> schedule;
+    vector<Activity> schedule;
+    int current_time = activities[0].start;
 
-	// TODO:
-	int current_time = 0;
-	for (auto activity : activities)
-	{
-		if (current_time <= activity.start)
-		{
-			schedule.push_back(activity);
-			current_time = activity.end;
-		}
-	}
+    for (Activity act : activities)
+    {
+        if (act.start >= current_time)
+        {
+            schedule.push_back(act);
+            current_time = act.end + 1;
+        }
+    }
 
-	return schedule;
+    return schedule;
 }
+
 
 int main()
 {
