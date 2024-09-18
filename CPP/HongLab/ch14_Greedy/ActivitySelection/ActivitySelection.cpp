@@ -10,9 +10,12 @@ struct Activity
 	int end;
 };
 
+// 종료시간이 빠른 순으로 정렬
 bool Compare(struct Activity a, struct Activity b)
 {
 	// TODO:
+	if (a.end < b.end)
+		return true;
 	return false;
 }
 
@@ -41,6 +44,7 @@ void Print(vector<Activity>& activities)
 	cout << endl;
 }
 
+// 종료시간이 빠른 것을 고르고 다음 종료시간이 빠른 일정의 시작시간이 현재시간보다 늦다면 선택
 vector<Activity> GreedyActivitySelection(vector<Activity>& activities)
 {
 	sort(activities.begin(), activities.end(), Compare);
@@ -50,6 +54,11 @@ vector<Activity> GreedyActivitySelection(vector<Activity>& activities)
 	vector<Activity> schedule;
 
 	// TODO:
+	const int current_time = 0;
+	for (const auto activity : activities)
+	{
+		current_time = activity.end();
+	}
 
 	return schedule;
 }
@@ -61,6 +70,7 @@ int main()
 
 	Print(activities);
 
+	// 가장 많은 스케줄을 선택할 수 있도록 조정
 	auto schedule = GreedyActivitySelection(activities);
 
 	cout << schedule.size() << " activities selected." << endl;
