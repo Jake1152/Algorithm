@@ -18,6 +18,8 @@ struct Compare
 	bool operator()(Node* l, Node* r)
 	{
 		// TODO:
+		if (l->freq > r->freq)
+			return true;
 		return false;
 	}
 };
@@ -42,21 +44,43 @@ void HuffmanCoding(vector<char> data, vector<int> freq)
 
 	for (int i = 0; i < data.size(); ++i)
 		heap.push(new Node{ string(1, data[i]), freq[i] });
+	
 
-	/*
 	while (heap.size() != 1)
 	{
 		Node* left, * right, * top;
 
 		// TODO:
-
+		left = heap.top();
+		heap.pop();
+		right = heap.top();
+		heap.pop();
+		heap.push(new Node{ left->data + right->data, left->freq + right->freq });
+		top = heap.top();
+		// top = new Node{ string(1, left->data + right->data), left->freq + right->freq };
 		cout << "(" << left->data << ", " << left->freq << ") + (" << right->data << ", " << right->freq << ") -> ";
 		cout << "(" << top->data << ", " << top->freq << ")" << endl;
 	}
+	PrintCodes(heap.top(), "");
+	/*
 	*/
 
-	PrintCodes(heap.top(), "");
 }
+
+/**
+ * 실행  예시
+(f, 5) + (e, 9) -> (fe, 14)
+(c, 12) + (b, 13) -> (cb, 25)
+(fe, 14) + (d, 16) -> (fed, 30)
+(cb, 25) + (fed, 30) -> (cbfed, 55)
+(a, 45) + (cbfed, 55) -> (acbfed, 100)
+a: 0
+c: 100
+b: 101
+f: 1100
+e: 1101
+d: 111
+ */
 
 int main()
 {
