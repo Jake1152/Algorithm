@@ -55,9 +55,11 @@ void HuffmanCoding(vector<char> data, vector<int> freq)
 		heap.pop();
 		right = heap.top();
 		heap.pop();
-		heap.push(new Node{ left->data + right->data, left->freq + right->freq });
-		top = heap.top();
-		// top = new Node{ string(1, left->data + right->data), left->freq + right->freq };
+		// new 할당 실패시에는 예외 발생, try-catch로 잡아주어야함
+		top = new Node{ left->data + right->data, left->freq + right->freq };
+		top->left = left;
+		top->right = right;
+		heap.push(top);
 		cout << "(" << left->data << ", " << left->freq << ") + (" << right->data << ", " << right->freq << ") -> ";
 		cout << "(" << top->data << ", " << top->freq << ")" << endl;
 	}
