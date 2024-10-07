@@ -57,7 +57,8 @@ int main()
 	for (auto& e : edges)
 	{
 		// TODO:
-
+		if (uf.Find(e.v) != uf.Find(e.u))
+			uf.Union(v, u);
 		mst_wt += e.weight;
 
 		cout << e.u << " - " << e.v << " : " << e.weight << endl;
