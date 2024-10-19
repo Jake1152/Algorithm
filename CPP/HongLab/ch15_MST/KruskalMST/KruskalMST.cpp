@@ -58,10 +58,12 @@ int main()
 	{
 		// TODO:
 		if (uf.Find(e.v) != uf.Find(e.u))
-			uf.Union(v, u);
-		mst_wt += e.weight;
+		{
+			uf.Union(e.v, e.u);
+			mst_wt += e.weight;
+			cout << e.u << " - " << e.v << " : " << e.weight << endl;
+		}
 
-		cout << e.u << " - " << e.v << " : " << e.weight << endl;
 	}
 
 	cout << mst_wt << endl;
