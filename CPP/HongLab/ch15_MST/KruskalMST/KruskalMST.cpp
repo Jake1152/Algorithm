@@ -56,6 +56,10 @@ int main()
 
 	for (auto& e : edges)
 	{
+		/** Honglab way
+		 * if (uf.Connected(e.u, e.v)) continue; 방식으로도 구현 가능
+		 * if (!uf.Connected(e.u, e.v)) // uf.Find(p) != uf.Find(q);
+		 */
 		// TODO:
 		if (uf.Find(e.v) != uf.Find(e.u))
 		{
