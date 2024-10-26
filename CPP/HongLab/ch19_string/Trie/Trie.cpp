@@ -47,14 +47,14 @@ public:
 		}
 	}
 
-	int Size() // 단어가 몇 개 추가되었는 지를 세어서 반환
+	int Size() // 단어가 몇 개 추가되었는지를 세어서 반환
 	{
 		return Size(root);
 	}
 
 	int Size(Node* n)
 	{
-		if (!n) return 0; // if(n == nullptr)
+		if (n == nullptr) return 0; // if(!n)
 
 		int count = 0;
 
@@ -70,22 +70,30 @@ public:
 	// 재귀호출을 사용하지 않는 삽입(insert)
 	void IterInsert(string key, string val)
 	{
-		if (!root) root = new Node;
+		if (root == nullptr)
+			root = new Node;
 
-		Node* n = root;
+		Node* node = root;
 
-		for (char c : key)
+		std::cout << "key : " << key << std::endl;
+		for (char ch : key)
 		{
-			// TODO: 필요한 경우 새로운 자식 노드 생성
+			std::cout << "ch : " << ch << std::endl;
+			// std::cout << "n->vlue  : " << n->value  << ", in IterInsert()" << std::endl;
 
-			// n = n->children.at(c); // n = n->children[c];
+			// TODO: 필요한 경우 새로운 자식 노드 생성
+			if (node->children.at(ch) == nullptr)
+			{
+				node->children.at(ch) = new Node;
+				node = node->children.at(ch); // n = n->children[c];
+			}
 
 			// 보충
 			// - children.at(c)는 children[c]와 같은 기능을 합니다.
 			// - at()은 []와 달리 인덱스의 범위를 확인하기 때문에 디버깅에 유리합니다.
 		}
-
-		n->value = val; // 키(key)의 마지막 글자에 해당하는 노드에는 값(value) 저장
+		std::cout << "val in IterInsert(): " << val << std::endl;
+		node->value = val; // 키(key)의 마지막 글자에 해당하는 노드에는 값(value) 저장
 	}
 
 	string IterSearch(string key)
@@ -94,7 +102,21 @@ public:
 		// 키(key)를 찾지 못했을 경우에는 빈 문자열(string(""))을 값(value)으로 반환
 		// 키의 마지막 글자에 해당하지 않는 노드의 value는 빈 문자열
 
-		return string(""); // TODO:
+		if (root == nullptr)
+			root = new Node;
+
+		Node* node = root;
+
+		std::cout << "key : " << key << std::endl;
+		for (char ch : key)
+		{
+			std::cout << "ch : " << ch << std::endl;
+
+			if (node->children.at(ch) == nullptr)
+				return string("");
+		}
+		std::cout << "node->value : " << node->value << std::endl;
+		return node->value;
 	}
 
 	// 재귀호출을 사용하는 삽입(Insert)
@@ -174,19 +196,19 @@ public:
 		return s.substr(0, l);
 	}
 
-	int SearchPrefix(Node* n, string s, int d, int l)
+	int SearchPrefix(Node* node, string str, int d, int longest_prefix_size)
 	{
 		// l은 지금까지 찾은 가장 긴 prefix의 길이
 
-		if (!n) return l;
+		if (node == nullptr) return longest_prefix_size;
 
 		// TODO: n->value가 비어있지 않다면 key의 마지막 글자라는 의미니까 l에 d를 기록
 
-		// TODO: d와 s.length()가 같다면 더 진행할 필요가 없으니까 l 반환
+		// TODO: d와 str.length()가 같다면 더 진행할 필요가 없으니까 l 반환
 
-		char c = s.at(d); // s[d]
+		char ch = str.at(d); // s[d]
 
-		return SearchPrefix(n->children[c], s, d + 1, l);
+		return SearchPrefix(node->children[ch], str, d + 1, longest_prefix_size);
 	}
 
 	vector<string> KeysThatMatch(string pat)
@@ -287,7 +309,7 @@ public:
 			if (n->children[c])
 			{
 				screen[level][3 * x] = char(c);
-				if (!n->children[c]->value.empty())
+				if (n->children[c]->value.empty() == false)
 					screen[level][3 * x + 1] = '*';
 				Display2D(n->children[c], x, level + 1, screen);
 				x += Width(n->children[c]);
@@ -340,7 +362,10 @@ int main()
 
 		// 키(key) 추가
 		for (auto w : words)
-			trie.IterInsert(w, w + "_value"); //trie.Insert(w, w + "_value"); // _value는 디버깅을 위한 임시 값(value) (뒤에서는 사전의 내용)
+		{
+			trie.IterInsert(w, w + "_value"); 
+			//trie.Insert(w, w + "_value"); // _value는 디버깅을 위한 임시 값(value) (뒤에서는 사전의 내용)
+		}
 
 		// 모든 키 출력
 		// and ant ball dad do she shells <- 알파벳 순서로 정렬되어서 출력됩니다.
@@ -443,7 +468,7 @@ void run_dict()
 {
 	Trie trie;
 
-	ifstream ifile("../eng_dic.txt");
+	ifstream ifile("./eng_dic.txt");
 	int count = 0;
 	while (ifile)
 	{
