@@ -1,6 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <iomanip>
+#include <numeric>
+#include <cmath>
+
 using namespace std;
 
 // 참고
@@ -9,8 +12,12 @@ using namespace std;
 int MaxSubSum(vector<int> arr, int k)
 {
 	int n = int(arr.size());
+	int max_sum = accumulate(arr.begin(), arr.begin() + k, 0);
 
-	return 0; // TODO
+	for (size_t idx = 1; idx < n - k; idx++)
+		max_sum = max(max_sum - arr.at(idx - 1) + arr.at(idx - 1 + k), max_sum);
+
+	return max_sum; // TODO
 }
 
 int main()
