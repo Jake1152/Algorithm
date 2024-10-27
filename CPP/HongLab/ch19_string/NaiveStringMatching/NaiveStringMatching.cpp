@@ -13,9 +13,15 @@ void NaiveStringMatcher(string& pat, string& txt)
 		cout << i % 10;
 	cout << endl;
 
-	// for (TODO)
-	//{
-	//}
+	for (int i = 0; i < N; i++)
+	{
+		if (txt.compare(i, M, pat) == 0)
+		{
+			for (int j = 0; j < i; j++)
+				cout << " ";
+			cout <<  pat << " " << i << endl;
+		}
+	}
 
 	cout << endl;
 }
