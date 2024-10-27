@@ -83,10 +83,8 @@ public:
 
 			// TODO: 필요한 경우 새로운 자식 노드 생성
 			if (node->children.at(ch) == nullptr)
-			{
 				node->children.at(ch) = new Node;
-				node = node->children.at(ch); // n = n->children[c];
-			}
+			node = node->children.at(ch); // n = n->children[c];
 
 			// 보충
 			// - children.at(c)는 children[c]와 같은 기능을 합니다.
@@ -103,7 +101,7 @@ public:
 		// 키의 마지막 글자에 해당하지 않는 노드의 value는 빈 문자열
 
 		if (root == nullptr)
-			root = new Node;
+			return string("");
 
 		Node* node = root;
 
