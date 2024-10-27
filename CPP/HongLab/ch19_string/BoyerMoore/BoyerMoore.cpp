@@ -9,38 +9,38 @@ using namespace std;
 class BoyerMoore
 {
 public:
-	vector<int> right;
-	string pattern;
+	vector<int> _right;
+	string _pattern;
 
 	BoyerMoore(string pattern)
-		: pattern(pattern)
+		: _pattern(pattern)
 	{
-		int M = int(pattern.size());
+		int M = int(this->_pattern.size());
 		int R = 128;
 
-		right.resize(R);
+		this->_right.resize(R);
 
 		for (int c = 0; c < R; c++)
-			right[c] = -1;              // 패턴에 포함되지 않는 글자는 -1
+			this->_right[c] = -1;              // 패턴에 포함되지 않는 글자는 -1
 		for (int j = 0; j < M; j++)
-			right[pattern.at(j)] = j;       // 여러번 나타날 경우 가장 뒤에(오른쪽에) 나타나는 글자 위치로 덮어씀
+			this->_right[this->_pattern.at(j)] = j;       // 여러번 나타날 경우 가장 뒤에(오른쪽에) 나타나는 글자 위치로 덮어씀
 
 		// 디버깅용 출력
-		for (int i = 0; i < pattern.size(); i++)
+		for (int i = 0; i < this->_pattern.size(); i++)
 			cout << i % 10;
 		cout << endl << pattern << endl;
 		for (char i = 'A'; i <= 'Z'; i++)
 			cout << "  " << i;
 		cout << endl;
 		for (int i = 'A'; i <= 'Z'; i++)
-			cout << setw(3) << right[i];
+			cout << setw(3) << this->_right[i];
 		cout << endl;
 	}
 
 	void Search(string txt)
 	{
 		int N = int(txt.size());
-		int M = int(pattern.size());
+		int M = int(this->_pattern.size());
 
 		for (int i = 0; i < txt.size(); i++)
 			cout << i % 10;
@@ -54,17 +54,18 @@ public:
 			skip = 0;
 			for (int j = M - 1; j >= 0; j--) // 패턴을 역순으로 비교
 			{
-				log.at(i + j) = pattern.at(j); // 디버깅용 출력
+				log.at(i + j) = this->_pattern.at(j); // 디버깅용 출력
 
-				// cout << log << endl;
+				cout << "log : " << log << endl;
 
-				if (pattern.at(j) != txt.at(i + j)) // 매칭이 되지 않을 경우
+				if (this->_pattern.at(j) != txt.at(i + j)) // 매칭이 되지 않을 경우
 				{
-					// skip = TODO; // right 표를 사용해서 몇 칸 건너뛸지 결정
-					skip = j - right.at(txt.at(i + j));
+					// skip = TODO; // this->_right 표를 사용해서 몇 칸 건너뛸지 결정
 					// 힌트
 					// 1. 패턴 안에서 현재 몇 번째 글자를 매칭하고 있었는지와 일치하지 않는 글자와의 거리
-					// 2. 패턴이 없는 글자라서 right의 값이 -1이라면 완전히 벗어나는 거리만큼 skip
+					// 2. 패턴이 없는 글자라서 this->_right의 값이 -1이라면 완전히 벗어나는 거리만큼 skip
+					// skip = j;
+					skip = j - this->_right.at(txt.at(i + j));
 
 					if (skip < 1) skip = 1;
 					// skip < 1 이라는 것은, 패턴 안에서 볼때 현재 위치보다 오른쪽의 위치로 스킵하라는 의미가 된다.
