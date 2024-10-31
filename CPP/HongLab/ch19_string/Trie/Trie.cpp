@@ -147,10 +147,6 @@ public:
 	{
 		// 마지막 글자의 노드 포인터 반환
 		// 찾지 못했다면 nullptr 반환
-		// cout << "n->children.at(key[d])->value : " << n->children.at(key[d])->value << endl;
-		cout << "key : " << key << endl;
-		cout << "d : " << d << endl;
-		cout << "n->value : " << n->value << endl;
 		if (n->children.at(key[d]))
 			return Search(n->children.at(key[d]), key, d + 1);
 		return n;
@@ -181,11 +177,14 @@ public:
 	{
 		if (!n) return;
 
-		if (!n->value.empty()) keys.push_back(pre);
+		// cout << "pre : " << pre << endl;
+		if (n->value.empty() == false) keys.push_back(pre);
 
 		for (int c = 0; c < R; c++)
 		{
 			// TODO: Collect(...)
+			if (n->children.at(c))
+				Collect(n->children.at(c), n->children.at(c)->value, keys);
 		}
 	}
 
@@ -396,7 +395,8 @@ int main()
 		// 특정 문자열로 시작하는 키 검색
 		// dad do <- "d"로 시작하는 단어들이 모두 출력
 		cout << "KeysWithPrefix()" << endl;
-		for (const auto& k : trie.KeysWithPrefix("d"))
+		for (const auto& k : trie.KeysWithPrefix("a"))
+		// for (const auto& k : trie.KeysWithPrefix("d"))
 		{
 			cout << k << " ";
 		}
