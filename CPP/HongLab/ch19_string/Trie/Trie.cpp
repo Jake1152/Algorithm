@@ -188,12 +188,25 @@ public:
 		}
 	}
 
+	/** LongestPrefixOf(string s)
+	 * 인자로 주어진 문자열에서 현재 dict에 있는 값 중 가장 많이 일치하는 문자열을 찾아서 return 한다.
+	 * 1. SearchPrefix()를 이용해서 가장 많은 공통 부분을 갖는 문자열의 길이를 알아낸다.
+	 * 2. 알아낸 문자열의 길이를 가지고 인자로 주어진 문자열에서 그 길이 만큼 잘라서 return 한다.
+	 */
 	string LongestPrefixOf(string s)
 	{
 		int l = SearchPrefix(root, s, 0, 0);
 		return s.substr(0, l);
 	}
 
+	/** SearchPrefix(Node* node, string str, int d, int longest_prefix_size)
+	 * 인자로 주어진 문자열에서 앞부분이 일치하는 문자열의 길이를 알아낸다.
+	 * 1. 다음 문자 노드가 null이면 longest_prefix_size를 return 한다.
+	 * 2. n->value가 비어있지 않다면 key의 마지막 글자이므로 longest_prefix_size에 현재 문자열의 길이를 저장한다.
+	 * 3. 현재 문자열의 길이와 찾고자 하는 문자열의 길이가 같다면 더 이상 진행할 필요가 없으므로 longest_prefix_size를 return 한다.
+	 * 4. 가장 최근에 찾은 문자 노드, 찾고자 하는 문자열, 현재까지 찾은 문자열 길이 + 1, longest_prefix_size를 인자로해서 SearchPrefix()를 재귀호출한다.
+	 *    즉, return SearchPrefix() 형태이어야 한다.
+	 */
 	int SearchPrefix(Node* node, string str, int d, int longest_prefix_size)
 	{
 		// l은 지금까지 찾은 가장 긴 prefix의 길이
@@ -201,8 +214,12 @@ public:
 		if (node == nullptr) return longest_prefix_size;
 
 		// TODO: n->value가 비어있지 않다면 key의 마지막 글자라는 의미니까 l에 d를 기록
+		if (node->value.empty() == false)
+			longest_prefix_size = d;
 
 		// TODO: d와 str.length()가 같다면 더 진행할 필요가 없으니까 l 반환
+		if (str.length() == d)
+			return longest_prefix_size;
 
 		char ch = str.at(d); // s[d]
 
@@ -395,13 +412,12 @@ int main()
 		// 특정 문자열로 시작하는 키 검색
 		// dad do <- "d"로 시작하는 단어들이 모두 출력
 		cout << "KeysWithPrefix()" << endl;
-		for (const auto& k : trie.KeysWithPrefix("a"))
-		// for (const auto& k : trie.KeysWithPrefix("d"))
+		// for (const auto& k : trie.KeysWithPrefix("a"))
+		for (const auto& k : trie.KeysWithPrefix("d"))
 		{
 			cout << k << " ";
 		}
 		cout << endl << endl;
-		/*
 
 		// 앞 부분이 겹치는 가장 긴 단어 출력
 		cout << "LongestPrefixOf()" << endl;
@@ -411,6 +427,7 @@ int main()
 		cout << trie.LongestPrefixOf("shallow") << endl;   // 공백(찾지 못함)
 		cout << endl;
 
+		/*
 		// 와일드카드(wildcard) ? 테스트
 		// ? 자리에 어떤 글자든지 들어갈 수 있음
 		// "an?" 에서 ? 자리가 각각 d와 t인 "and" 와 "ant" 출력
