@@ -75,22 +75,24 @@ public:
 
 		Node* node = root;
 
-		std::cout << "key : " << key << std::endl;
+		// std::cout << "key : " << key << std::endl;
 		for (char ch : key)
 		{
-			std::cout << "ch : " << ch << std::endl;
+			// std::cout << "ch : " << ch << std::endl;
 			// std::cout << "n->vlue  : " << n->value  << ", in IterInsert()" << std::endl;
 
 			// TODO: 필요한 경우 새로운 자식 노드 생성
 			if (node->children.at(ch) == nullptr)
+			{
 				node->children.at(ch) = new Node;
+			}
 			node = node->children.at(ch); // n = n->children[c];
 
 			// 보충
 			// - children.at(c)는 children[c]와 같은 기능을 합니다.
 			// - at()은 []와 달리 인덱스의 범위를 확인하기 때문에 디버깅에 유리합니다.
 		}
-		std::cout << "val in IterInsert(): " << val << std::endl;
+		// std::cout << "val in IterInsert(): " << val << std::endl;
 		node->value = val; // 키(key)의 마지막 글자에 해당하는 노드에는 값(value) 저장
 	}
 
@@ -105,16 +107,12 @@ public:
 
 		Node* node = root;
 
-		std::cout << "key : " << key << std::endl;
 		for (char ch : key)
 		{
-			std::cout << "ch : " << ch << std::endl;
-
-			if (node->children.at(ch) == nullptr)
-				return string("");
+			if (node->children.at(ch))
+				node = node->children.at(ch);
 		}
-		std::cout << "node->value : " << node->value << std::endl;
-		return node->value;
+		return static_cast<string>(node->value);
 	}
 
 	// 재귀호출을 사용하는 삽입(Insert)
@@ -399,6 +397,7 @@ int main()
 			cout << k << " ";
 		}
 		cout << endl << endl;
+		/*
 
 		// 앞 부분이 겹치는 가장 긴 단어 출력
 		cout << "LongestPrefixOf()" << endl;
@@ -433,6 +432,7 @@ int main()
 		for (const auto& k : trie.Keys())
 			cout << k << " ";
 		cout << endl << endl;
+		*/
 	}
 
 	// 와일드카드 * 테스트
@@ -458,6 +458,7 @@ int main()
 
 	// 영어 사전 (사전 파일을 읽어들이는 데에 시간이 약간 걸립니다.)
 	// run_dict();
+
 
 	return 0;
 }
