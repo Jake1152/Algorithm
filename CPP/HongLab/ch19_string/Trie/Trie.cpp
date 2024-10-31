@@ -79,13 +79,11 @@ public:
 		for (char ch : key)
 		{
 			// std::cout << "ch : " << ch << std::endl;
-			// std::cout << "n->vlue  : " << n->value  << ", in IterInsert()" << std::endl;
+			// std::cout << "n->value  : " << n->value  << ", in IterInsert()" << std::endl;
 
 			// TODO: 필요한 경우 새로운 자식 노드 생성
 			if (node->children.at(ch) == nullptr)
-			{
 				node->children.at(ch) = new Node;
-			}
 			node = node->children.at(ch); // n = n->children[c];
 
 			// 보충
@@ -149,8 +147,13 @@ public:
 	{
 		// 마지막 글자의 노드 포인터 반환
 		// 찾지 못했다면 nullptr 반환
-
-		return nullptr; // TODO:
+		// cout << "n->children.at(key[d])->value : " << n->children.at(key[d])->value << endl;
+		cout << "key : " << key << endl;
+		cout << "d : " << d << endl;
+		cout << "n->value : " << n->value << endl;
+		if (n->children.at(key[d]))
+			return Search(n->children.at(key[d]), key, d + 1);
+		return n;
 	}
 
 	// 저장되어 있는 모든 키들을 찾아서 반환
@@ -383,7 +386,8 @@ int main()
 		cout << "Search" << endl;
 		for (auto w : vector<string>{ "do", "dad", "hello" })
 		{
-			string value = trie.IterSearch(w); // string value = trie.Search(w);
+			// string value = trie.IterSearch(w); // string value = trie.Search(w);
+			string value = trie.Search(w);
 			if (value.empty()) value = "Not found"; // 반환 문자열이 비어있다면 못 찾은 상황
 			cout << w << " : " << value << endl;
 		}

@@ -13,34 +13,34 @@ void NaiveStringMatcher(string& pat, string& txt)
 		cout << i % 10;
 	cout << endl;
 
-	// for (int i = 0; i < N; i++)
-	// {
-	// 	if (txt.compare(i, M, pat) == 0)
-	// 	{
-	// 		for (int j = 0; j < i; j++)
-	// 			cout << " ";
-	// 		cout <<  pat << " " << i << endl;
-	// 	}
-	// }
+	for (int i = 0; i < N; i++)
+	{
+		if (txt.compare(i, M, pat) == 0)
+		{
+			for (int j = 0; j < i; j++)
+				cout << " ";
+			cout <<  pat << " " << i << endl;
+		}
+	}
 	
 	// # HongLab Way
 	// i <= N - M 조건을 줌으로써 불필요한 부분들을 반복 돌지 않을 수 있음
-	for (int i = 0; i <= N - M; i++) // N 까지가 아니라 N - M 까지입니다.
-    {
-        int j;
-        for (j = 0; j < M; j++)
-        {
-            if (txt[i + j] != pat[j])
-                break;
-        }
+	// for (int i = 0; i <= N - M; i++) // N 까지가 아니라 N - M 까지입니다.
+    // {
+    //     int j;
+    //     for (j = 0; j < M; j++)
+    //     {
+    //         if (txt[i + j] != pat[j])
+    //             break;
+    //     }
 
-        if (j == M)
-        {
-            for (int s = 0; s < i; s++)
-                cout << " ";
-            cout << pat << " " << i << endl;
-        }
-    }
+    //     if (j == M)
+    //     {
+    //         for (int s = 0; s < i; s++)
+    //             cout << " ";
+    //         cout << pat << " " << i << endl;
+    //     }
+    // }
 
 	cout << endl;
 }

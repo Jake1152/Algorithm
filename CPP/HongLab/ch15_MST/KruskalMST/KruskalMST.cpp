@@ -52,7 +52,7 @@ int main()
 
 	double mst_wt = 0.0;
 
-	UnionFind uf(9);
+	UnionFind uf(edges.size()); // 9개 정점
 
 	for (auto& e : edges)
 	{
@@ -65,7 +65,11 @@ int main()
 		{
 			uf.Union(e.v, e.u);
 			mst_wt += e.weight;
-			cout << e.u << " - " << e.v << " : " << e.weight << endl;
+			cout << e.u << " - " << e.v << " : " << e.weight << "\t,mst_wt : " << mst_wt << endl;
+		}
+		else
+		{
+			cout << "##" << e.u << " - " << e.v << " : " << e.weight << "\t,mst_wt : " << mst_wt << endl;
 		}
 
 	}
