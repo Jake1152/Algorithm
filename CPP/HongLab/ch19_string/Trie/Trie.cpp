@@ -226,31 +226,49 @@ public:
 		return SearchPrefix(node->children[ch], str, d + 1, longest_prefix_size);
 	}
 
-	vector<string> KeysThatMatch(string pat)
+	/** KeysThatMatch(string pattern)
+	 * 패턴이 일치하는 문자열을 찾아서 return한다.
+	 * 와일드카드도 가능!
+	 * 
+	 * keys vector에 pattern에 해당하는 단어들을 추가한다.
+	 */
+	vector<string> KeysThatMatch(string pattern)
 	{
 		vector<string> keys;
 
-		CollectMatch(root, string(""), pat, keys);
+		CollectMatch(root, string(""), pattern, keys);
 
 		return keys;
 	}
 
-	void CollectMatch(Node* n, string pre, string pat, vector<string>& keys)
+	/**
+	 * nullptr
+	 *   |
+	 *  'a'
+	 *   |
+	 *  'n'
+	 *   |
+	 *   
+	 */
+	void CollectMatch(Node* node, string pre, string pattern, vector<string>& keys)
 	{
-		if (!n) return;
+		if (!node) return;
 
 		int d = int(pre.length());
 
-		if (d == pat.length() && !n->value.empty())
+		// wildcard 케이스는 어떻게 처리할 것인가?
+		if (d == pattern.length() && node->value.empty() == false)
 			keys.push_back(pre);
 
-		if (d == pat.length()) return;
+		if (d == pattern.length()) return;
 
-		char next = pat.at(d);
+		char next = pattern.at(d);
 
 		if (next == '?')
 		{
 			// TODO: ? 자리에 어떤 글자든지 들어올 수 있다 -> 모든 글자에 대해 재귀 호출
+			for (int i = 0; i < this->R ; i++)
+				CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
 		}
 		else if (next == '*')
 		{
@@ -259,16 +277,17 @@ public:
 
 			// 난이도가 높은 도전 문제입니다. 
 
-			// 힌트: 3가지 경우에 대해 CollectMatch()를 재귀호출합니다.
-			// 1. * 자리에 글자가 없는 경우 (예: wor*d로 word를 찾음)
-			// 2. * 자리에 ?처럼 어떤 글자든지 들어갈 수 있는 경우
-			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
-
 			// TODO:
+			for (int i = 0; i < this->R ; i++)
+				CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
 		}
-		else
+		else // "she"
 		{
+			
 			// TODO: 그 외의 일반적인 알파벳일 경우
+			if (node->children.at(next))
+				CollectMatch(node->children.at(next), pre + next, pattern, keys);
+			// return node->value;
 		}
 	}
 
@@ -427,12 +446,14 @@ int main()
 		cout << trie.LongestPrefixOf("shallow") << endl;   // 공백(찾지 못함)
 		cout << endl;
 
-		/*
 		// 와일드카드(wildcard) ? 테스트
 		// ? 자리에 어떤 글자든지 들어갈 수 있음
 		// "an?" 에서 ? 자리가 각각 d와 t인 "and" 와 "ant" 출력
+
 		cout << "KeysThatMatch()" << endl;
-		for (const auto& k : trie.KeysThatMatch("an?"))
+		// for (const auto& k : trie.KeysThatMatch("ant"))
+		// for (const auto& k : trie.KeysThatMatch("an?"))
+		for (const auto& k : trie.KeysThatMatch("an??"))
 		{
 			cout << k << " ";
 		}
@@ -453,6 +474,8 @@ int main()
 		for (const auto& k : trie.Keys())
 			cout << k << " ";
 		cout << endl << endl;
+		/*
+
 		*/
 	}
 
@@ -521,3 +544,9 @@ void run_dict()
 		cout << endl;
 	}
 }
+
+
+			// 힌트: 3가지 경우에 대해 CollectMatch()를 재귀호출합니다.
+			// 1. * 자리에 글자가 없는 경우 (예: wor*d로 word를 찾음)
+			// 2. * 자리에 ?처럼 어떤 글자든지 들어갈 수 있는 경우
+			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
