@@ -1,9 +1,9 @@
-NAME = Trie
+NAME = RabinKarp
 CXX = g++
 CXXFLAGS = -g -std=c++11#-Wall -Wextra -Werror
 RM = rm -f
 
-SRCS = Trie.cpp
+SRCS = RabinKarp.cpp
 
 OBJS = $(SRCS:.cpp=.o)
 
