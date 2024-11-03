@@ -48,7 +48,7 @@ public:
 				// return strcmp(&this->_txt.c_str()[this->_sa[a]], &this->_txt.c_str()[this->_sa[b]]) < 0;
 				// return static_cast<bool>(strcmp(&this->_txt.c_str()[this->_sa[a]], &this->_txt.c_str()[this->_sa[b]])) == false;
 				// return false; // TODO: strcmp() 사용
-				// strcmp(&this->_txt.c_str()[this->_sa[mid]], pat.c_str()); // 힌트로 사용하세요
+				// strcmp(&this->_txt.c_str()[this->_sa[mid]], pattern.c_str()); // 힌트로 사용하세요
 			}
 		);
 
@@ -58,7 +58,7 @@ public:
 		cout << endl << endl;
 	}
 
-	void Search(string pat)
+	void Search(string pattern)
 	{
 		for (int i = 0; i < this->_txt.size(); i++)
 			cout << i % 10;
@@ -67,9 +67,14 @@ public:
 		int l = 0, r = int(this->_sa.size() - 1);
 		while (l <= r)
 		{
+			// TO KNOW: 왜 mid 계산을 l + (r - l) / 2로 하는가?
 			int mid = l + (r - l) / 2;
 
-			int compare = strcmp(&this->_txt.c_str()[this->_sa[mid]], pat.c_str()); // 힌트로 사용하세요
+			// cout << "l : " << l << ",\tr : " << r << endl;
+			// cout << "&this->_txt.c_str()[this->_sa[mid]] : " << &this->_txt.c_str()[this->_sa[mid]] << endl;
+			// cout << "pattern.c_str() : " << pattern.c_str() << endl;
+			int compare = strcmp(&this->_txt.c_str()[this->_sa[mid]], pattern.c_str()); // 힌트로 사용하세요
+			// cout << "compare : " << compare << endl;
 
 			if (compare == 0)
 			{
@@ -78,17 +83,31 @@ public:
 				matched.insert(this->_sa[mid]);
 
 				// TODO: 
+				// for (int i = mid - 1; i >= 0 && strcmp(&_txt.c_str()[this->_sa[i]], pattern.c_str(), pattern.size()) == 0; i--)
+				// Honglab way
+				for (int i = mid - 1; i >= 0 && strncmp(&_txt.c_str()[_sa[i]], pattern.c_str(), pattern.size()) == 0; i--)
+                    matched.insert(_sa[i]);
+                for (int i = mid + 1; i < _txt.size() && strncmp(&_txt.c_str()[_sa[i]], pattern.c_str(), pattern.size()) == 0; i++)
+                    matched.insert(_sa[i]);
 
 				for (int index : matched)
-					cout << string(index, ' ') << pat << " " << index << endl;
+					cout << string(index, ' ') << pattern << " " << index << endl;
 				cout << endl;
 
 				return;
 			}
-
+			else if (compare > 0)
+			{
+				r = mid - 1;
+			}
+			else if (compare < 0)
+			{
+				l = mid + 1;
+			}
+			// cout << "l : " << l << ",\tr : " << r << endl;
 			// TODO: mid 변경
-			return; // TODO: 제거
 		}
+		return; // TODO: 제거
 
 		cout << "Not found" << endl;
 	}

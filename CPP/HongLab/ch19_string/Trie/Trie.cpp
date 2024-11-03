@@ -68,6 +68,7 @@ public:
 	}
 
 	// 재귀호출을 사용하지 않는 삽입(insert)
+	// "do"
 	void IterInsert(string key, string val)
 	{
 		if (root == nullptr)
@@ -100,8 +101,8 @@ public:
 		// 키(key)를 찾지 못했을 경우에는 빈 문자열(string(""))을 값(value)으로 반환
 		// 키의 마지막 글자에 해당하지 않는 노드의 value는 빈 문자열
 
-		if (root == nullptr)
-			return string("");
+		// if (this->root == nullptr)
+		// 	return string("");
 
 		Node* node = root;
 
@@ -110,7 +111,9 @@ public:
 			if (node->children.at(ch))
 				node = node->children.at(ch);
 		}
+		// ""
 		return static_cast<string>(node->value);
+		// return node->value;
 	}
 
 	// 재귀호출을 사용하는 삽입(Insert)
@@ -248,7 +251,6 @@ public:
 	 *   |
 	 *  'n'
 	 *   |
-	 *   
 	 */
 	void CollectMatch(Node* node, string pre, string pattern, vector<string>& keys)
 	{
@@ -266,7 +268,9 @@ public:
 
 		if (next == '?')
 		{
-			// TODO: ? 자리에 어떤 글자든지 들어올 수 있다 -> 모든 글자에 대해 재귀 호출
+			// TODO: ? 자리에 어떤 글자든지 들어올 수 있다 -> 모든 글자에 대해 재귀 호출 
+			// "ant?"
+			// ant
 			for (int i = 0; i < this->R ; i++)
 				CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
 		}
@@ -421,8 +425,8 @@ int main()
 		cout << "Search" << endl;
 		for (auto w : vector<string>{ "do", "dad", "hello" })
 		{
-			// string value = trie.IterSearch(w); // string value = trie.Search(w);
-			string value = trie.Search(w);
+			string value = trie.IterSearch(w); // string value = trie.Search(w);
+			// string value = trie.Search(w);
 			if (value.empty()) value = "Not found"; // 반환 문자열이 비어있다면 못 찾은 상황
 			cout << w << " : " << value << endl;
 		}
@@ -431,8 +435,8 @@ int main()
 		// 특정 문자열로 시작하는 키 검색
 		// dad do <- "d"로 시작하는 단어들이 모두 출력
 		cout << "KeysWithPrefix()" << endl;
-		// for (const auto& k : trie.KeysWithPrefix("a"))
-		for (const auto& k : trie.KeysWithPrefix("d"))
+		for (const auto& k : trie.KeysWithPrefix("a"))
+		// for (const auto& k : trie.KeysWithPrefix("d`"))
 		{
 			cout << k << " ";
 		}
