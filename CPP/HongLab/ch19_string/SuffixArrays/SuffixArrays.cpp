@@ -4,62 +4,78 @@
 #include <vector>
 #include <iomanip>
 #include <set>
+#include <cstring>
+
 using namespace std;
 
 class SuffixArray
 {
 public:
-	string txt;
-	vector<int> sa;
+	string _txt;
+	vector<int> _sa;
 
 	SuffixArray(string txt)
-		: txt(txt)
+		: _txt(txt)
 	{
 		BuildSuffixArray();
 	}
 
 	void BuildSuffixArray()
 	{
-		sa.resize(txt.size()); // suffix array
+		this->_sa.resize(this->_txt.size()); // suffix array
 
-		for (int i = 0; i < txt.size(); i++)
-			sa[i] = i;
+		for (int i = 0; i < this->_txt.size(); i++)
+			this->_sa[i] = i;
 
 		cout << "Before sorting" << endl;
-		for (int i = 0; i < sa.size(); i++)
-			cout << setw(3) << i << " : " << setw(3) << sa[i] << " : " << txt.substr(sa[i], sa.size() - sa[i]) << endl;
+		for (int i = 0; i < this->_sa.size(); i++)
+			cout << setw(3) << i << " : " << setw(3) << this->_sa[i] << " : " << this->_txt.substr(this->_sa[i], this->_sa.size() - this->_sa[i]) << endl;
 		cout << endl;
 
-		sort(sa.begin(), sa.end(),
+		// for (vector<int>::iterator iter = this->_sa.begin(); iter != this->_sa.end(); iter++)
+		// 	cout << "*iter : " << *iter << endl;
+
+		sort(this->_sa.begin(), this->_sa.end(),
 			[&](int a, int b) {
-				return false; // TODO: strcmp() 사용
+				// cout << "a : " << a << ",b : " << b << endl;
+				// cout << "this->_txt.c_str() : " << this->_txt.c_str() << endl;
+				// cout << "this->_txt.c_str()[this->_sa[a]] : " << this->_txt.c_str()[this->_sa[a]] << endl; 
+				// cout << "this->_txt.c_str()[this->_sa[b]] : " << this->_txt.c_str()[this->_sa[b]] << endl; 
+				// cout << "this->_txt.c_str()[a] : " << this->_txt.c_str()[a] << endl; 
+				// cout << "this->_txt.c_str()[b] : " << this->_txt.c_str()[b] << endl; 
+				// return strcmp(&this->_txt.c_str()[a], &this->_txt.c_str()[b]) < 0;
+				return strcmp(&this->_txt.c_str()[a], &this->_txt.c_str()[b]) < 0;
+				// return strcmp(&this->_txt.c_str()[this->_sa[a]], &this->_txt.c_str()[this->_sa[b]]) < 0;
+				// return static_cast<bool>(strcmp(&this->_txt.c_str()[this->_sa[a]], &this->_txt.c_str()[this->_sa[b]])) == false;
+				// return false; // TODO: strcmp() 사용
+				// strcmp(&this->_txt.c_str()[this->_sa[mid]], pat.c_str()); // 힌트로 사용하세요
 			}
 		);
 
 		cout << "After sorting" << endl;
-		for (int i = 0; i < sa.size(); i++)
-			cout << setw(3) << i << " : " << setw(3) << sa[i] << " : " << txt.substr(sa[i], sa.size() - sa[i]) << endl;
+		for (int i = 0; i < this->_sa.size(); i++)
+			cout << setw(3) << i << " : " << setw(3) << this->_sa[i] << " : " << this->_txt.substr(this->_sa[i], this->_sa.size() - this->_sa[i]) << endl;
 		cout << endl << endl;
 	}
 
 	void Search(string pat)
 	{
-		for (int i = 0; i < txt.size(); i++)
+		for (int i = 0; i < this->_txt.size(); i++)
 			cout << i % 10;
-		cout << endl << txt << endl;
+		cout << endl << this->_txt << endl;
 
-		int l = 0, r = int(sa.size() - 1);
+		int l = 0, r = int(this->_sa.size() - 1);
 		while (l <= r)
 		{
 			int mid = l + (r - l) / 2;
 
-			int compare = strcmp(&txt.c_str()[sa[mid]], pat.c_str()); // 힌트로 사용하세요
+			int compare = strcmp(&this->_txt.c_str()[this->_sa[mid]], pat.c_str()); // 힌트로 사용하세요
 
 			if (compare == 0)
 			{
 				// 매칭되는 순서대로 출력하기 위해 set에 저장해서 정렬했다가 출력
 				set<int> matched;
-				matched.insert(sa[mid]);
+				matched.insert(this->_sa[mid]);
 
 				// TODO: 
 
