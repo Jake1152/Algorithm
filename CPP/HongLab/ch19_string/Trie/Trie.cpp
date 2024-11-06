@@ -119,37 +119,39 @@ public:
 		root = Insert(root, key, val, 0);
 	}
 
-	Node* Insert(Node*& n, string key, string val, int d)
+	Node* Insert(Node*& node, string key, string val, int d)
 	{
-		if (!n) n = new Node; // Node*& 포인터에 대한 참조 사용
+		if (node == nullptr) node = new Node; // Node*& 포인터에 대한 참조 사용
 
 		if (d == key.length())
 		{
 			// TODO: 해당 노드에 val 저장
-			return n;
+			node->value = val;
+			return node;
 		}
 
 		// TODO: 다음 글자로 진행 (주의: d + 1)
-
-		return n;
+		char ch = key.at(d);
+		Insert(node->children.at(ch), key, val, d + 1);
+		return node;
 	}
 
 	string Search(string key)
 	{
-		Node* n = Search(root, key, 0);
+		Node* node = Search(root, key, 0);
 
-		if (!n) return string("");
+		if (!node) return string("");
 
-		return n->value;
+		return node->value;
 	}
 
-	Node* Search(Node* n, string key, int d)
+	Node* Search(Node* node, string key, int d)
 	{
 		// 마지막 글자의 노드 포인터 반환
 		// 찾지 못했다면 nullptr 반환
-		if (n->children.at(key[d]))
-			return Search(n->children.at(key[d]), key, d + 1);
-		return n;
+		if (node->children.at(key[d]))
+			return Search(node->children.at(key[d]), key, d + 1);
+		return node;
 	}
 
 	// 저장되어 있는 모든 키들을 찾아서 반환
@@ -165,26 +167,26 @@ public:
 		vector<string> keys;
 
 		// Search()로 키(key)가 pre인 노드를 찾고
-		Node* n = Search(root, pre, 0);
+		Node* node = Search(root, pre, 0);
 
 		// 그 자식 노드들을 모두 모아서 반환
-		Collect(n, pre, keys);
+		Collect(node, pre, keys);
 
 		return keys;
 	}
 
-	void Collect(Node* n, string pre, vector<string>& keys)
+	void Collect(Node* node, string pre, vector<string>& keys)
 	{
-		if (!n) return;
+		if (!node) return;
 
 		// cout << "pre : " << pre << endl;
-		if (n->value.empty() == false) keys.push_back(pre);
+		if (node->value.empty() == false) keys.push_back(pre);
 
 		for (int c = 0; c < R; c++)
 		{
 			// TODO: Collect(...)
-			if (n->children.at(c))
-				Collect(n->children.at(c), n->children.at(c)->value, keys);
+			if (node->children.at(c))
+				Collect(node->children.at(c), node->children.at(c)->value, keys);
 		}
 	}
 
@@ -326,7 +328,6 @@ public:
 		}
 		else // "she"
 		{
-			
 			// TODO: 그 외의 일반적인 알파벳일 경우
 			if (node->children.at(next))
 				CollectMatch(node->children.at(next), pre + next, pattern, keys);
@@ -439,8 +440,8 @@ int main()
 		// 키(key) 추가
 		for (auto w : words)
 		{
-			trie.IterInsert(w, w + "_value"); 
-			//trie.Insert(w, w + "_value"); // _value는 디버깅을 위한 임시 값(value) (뒤에서는 사전의 내용)
+			// trie.IterInsert(w, w + "_value"); 
+			trie.Insert(w, w + "_value"); // _value는 디버깅을 위한 임시 값(value) (뒤에서는 사전의 내용)
 		}
 
 		// 모든 키 출력
