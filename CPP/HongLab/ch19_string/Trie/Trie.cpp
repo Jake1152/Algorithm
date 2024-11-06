@@ -258,7 +258,13 @@ public:
 
 		// wildcard 케이스는 어떻게 처리할 것인가?
 		if (d == pattern.length() && node->value.empty() == false)
+		{
+			cout << "# pattern : " << pattern << endl;
+			cout << "# pre : " << pre << endl;
+			cout << "# node->value : " << node->value << endl << endl;
 			keys.push_back(pre);
+			
+		}
 
 		if (d == pattern.length()) return;
 
@@ -285,8 +291,7 @@ public:
 			// 참고: https://www.geeksforgeeks.org/wildcard-character-matching/  
 			//      https://github.com/TeodorDyakov/wildcard-trie/blob/master/src/main/java/trie/Trie.java
 
-			// 난이도가 높은 도전 문제입니다. 
-
+			// 난이도가 높은 도전 문제입니다.
 
 			// 힌트: 3가지 경우에 대해 CollectMatch()를 재귀호출합니다.
 			// 1. * 자리에 글자가 없는 경우 (예: wor*d로 word를 찾음)
@@ -297,29 +302,26 @@ public:
 			string pre_str = pattern.substr(0, d);
 			string post_str = pattern.substr(d+1, pattern.length());
 			string new_pattern = pre_str + post_str;
-			cout << "new_pattern case 1 : " << new_pattern << endl << endl; 
+			cout << "new_pattern case 1 : " << new_pattern << endl; 
 			CollectMatch(node, pre, new_pattern, keys);
 
 			// 2. * 자리에 ?처럼 어떤 글자든지 들어갈 수 있는 경우
-			cout << "pattern case 2 : " << pattern << endl << endl; 
 			for (int i = 0; i < this->R ; i++)
 				if (node->children.at(i))
 					CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
 
 			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
+			cout << "pattern case 2 : " << pattern << endl; 
 			pre_str = pattern.substr(0, d);
 			post_str = pattern.substr(d, pattern.length());
-			new_pattern = pre_str + "*" + post_str;
-			cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
-			for (int i = 0; i < this->R ; i++)
-				if (node->children.at(i))
-					CollectMatch(node->children.at(i), pre + static_cast<char>(i), new_pattern, keys);
-
-			// TODO:
 			for (int i = 0; i < this->R ; i++)
 			{
-				// CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
-				// CollectMatch(node->children.at(i), pre, pattern, keys);
+				if (node->children.at(i))
+				{
+					new_pattern = pre_str + static_cast<char>(i) + post_str;
+					cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
+					CollectMatch(node->children.at(i), pre + static_cast<char>(i), new_pattern, keys);
+				}
 			}
 		}
 		else // "she"
