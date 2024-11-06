@@ -68,7 +68,6 @@ public:
 	}
 
 	// 재귀호출을 사용하지 않는 삽입(insert)
-	// "do"
 	void IterInsert(string key, string val)
 	{
 		if (root == nullptr)
@@ -101,8 +100,8 @@ public:
 		// 키(key)를 찾지 못했을 경우에는 빈 문자열(string(""))을 값(value)으로 반환
 		// 키의 마지막 글자에 해당하지 않는 노드의 value는 빈 문자열
 
-		// if (this->root == nullptr)
-		// 	return string("");
+		if (root == nullptr)
+			return string("");
 
 		Node* node = root;
 
@@ -111,9 +110,7 @@ public:
 			if (node->children.at(ch))
 				node = node->children.at(ch);
 		}
-		// ""
 		return static_cast<string>(node->value);
-		// return node->value;
 	}
 
 	// 재귀호출을 사용하는 삽입(Insert)
@@ -251,6 +248,7 @@ public:
 	 *   |
 	 *  'n'
 	 *   |
+	 *   
 	 */
 	void CollectMatch(Node* node, string pre, string pattern, vector<string>& keys)
 	{
@@ -268,11 +266,19 @@ public:
 
 		if (next == '?')
 		{
-			// TODO: ? 자리에 어떤 글자든지 들어올 수 있다 -> 모든 글자에 대해 재귀 호출 
-			// "ant?"
-			// ant
+			// TODO: ? 자리에 어떤 글자든지 들어올 수 있다 -> 모든 글자에 대해 재귀 호출
 			for (int i = 0; i < this->R ; i++)
-				CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
+				if (node->children.at(i))
+					CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
+			// # TODO: ? 자리에 아무 글자도 안들어올 수도 있지만, 그런 케이스를 감안하게 되면 중복이 발생할 수 있다.
+			// const string pre_str = pattern.substr(0, d);
+			// const string post_str = pattern.substr(d+1, pattern.length());
+			// const string new_pattern = pre_str + post_str;
+			// CollectMatch(node, pre, new_pattern, keys); // <= ?가 들어가는 패턴길이를 줄이면서 재귀 호출하는 방법('?' 개수에 따라 중복 발생 가능)
+			// cout << "pattern : " << pattern << endl; 
+			// cout << "pre_str : " << pre_str << "\t,d : " << d << endl; 
+			// cout << "post_str : " << post_str << "\t,d+1 : " << d+1<< endl;
+			// cout << "new_pattern : " << new_pattern << endl << endl; 
 		}
 		else if (next == '*')
 		{
@@ -283,7 +289,10 @@ public:
 
 			// TODO:
 			for (int i = 0; i < this->R ; i++)
-				CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
+			{
+				// CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
+				// CollectMatch(node->children.at(i), pre, pattern, keys);
+			}
 		}
 		else // "she"
 		{
@@ -291,7 +300,6 @@ public:
 			// TODO: 그 외의 일반적인 알파벳일 경우
 			if (node->children.at(next))
 				CollectMatch(node->children.at(next), pre + next, pattern, keys);
-			// return node->value;
 		}
 	}
 
@@ -425,8 +433,8 @@ int main()
 		cout << "Search" << endl;
 		for (auto w : vector<string>{ "do", "dad", "hello" })
 		{
-			string value = trie.IterSearch(w); // string value = trie.Search(w);
-			// string value = trie.Search(w);
+			// string value = trie.IterSearch(w); // string value = trie.Search(w);
+			string value = trie.Search(w);
 			if (value.empty()) value = "Not found"; // 반환 문자열이 비어있다면 못 찾은 상황
 			cout << w << " : " << value << endl;
 		}
@@ -435,8 +443,8 @@ int main()
 		// 특정 문자열로 시작하는 키 검색
 		// dad do <- "d"로 시작하는 단어들이 모두 출력
 		cout << "KeysWithPrefix()" << endl;
-		for (const auto& k : trie.KeysWithPrefix("a"))
-		// for (const auto& k : trie.KeysWithPrefix("d`"))
+		// for (const auto& k : trie.KeysWithPrefix("a"))
+		for (const auto& k : trie.KeysWithPrefix("d"))
 		{
 			cout << k << " ";
 		}
@@ -454,10 +462,15 @@ int main()
 		// ? 자리에 어떤 글자든지 들어갈 수 있음
 		// "an?" 에서 ? 자리가 각각 d와 t인 "and" 와 "ant" 출력
 
+		/**
+		 *  an? an??
+		 * an으로만 끝나도 된다면?
+		 * 중복 발생가능
+		 */
 		cout << "KeysThatMatch()" << endl;
 		// for (const auto& k : trie.KeysThatMatch("ant"))
 		// for (const auto& k : trie.KeysThatMatch("an?"))
-		for (const auto& k : trie.KeysThatMatch("an??"))
+		for (const auto& k : trie.KeysThatMatch("an????"))
 		{
 			cout << k << " ";
 		}
