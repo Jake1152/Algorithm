@@ -287,6 +287,34 @@ public:
 
 			// 난이도가 높은 도전 문제입니다. 
 
+
+			// 힌트: 3가지 경우에 대해 CollectMatch()를 재귀호출합니다.
+			// 1. * 자리에 글자가 없는 경우 (예: wor*d로 word를 찾음)
+			//		*자리에 글자가 없는지 어떻게 알 수 있는가?
+			//	wor 다음은 d가 있다
+			//  *대신 d가 들어간다고 볼 수 있다.
+			// * 다음 글자를 하나 지운다?
+			string pre_str = pattern.substr(0, d);
+			string post_str = pattern.substr(d+1, pattern.length());
+			string new_pattern = pre_str + post_str;
+			cout << "new_pattern case 1 : " << new_pattern << endl << endl; 
+			CollectMatch(node, pre, new_pattern, keys);
+
+			// 2. * 자리에 ?처럼 어떤 글자든지 들어갈 수 있는 경우
+			cout << "pattern case 2 : " << pattern << endl << endl; 
+			for (int i = 0; i < this->R ; i++)
+				if (node->children.at(i))
+					CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
+
+			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
+			pre_str = pattern.substr(0, d);
+			post_str = pattern.substr(d, pattern.length());
+			new_pattern = pre_str + "*" + post_str;
+			cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
+			for (int i = 0; i < this->R ; i++)
+				if (node->children.at(i))
+					CollectMatch(node->children.at(i), pre + static_cast<char>(i), new_pattern, keys);
+
 			// TODO:
 			for (int i = 0; i < this->R ; i++)
 			{
@@ -561,9 +589,3 @@ void run_dict()
 		cout << endl;
 	}
 }
-
-
-			// 힌트: 3가지 경우에 대해 CollectMatch()를 재귀호출합니다.
-			// 1. * 자리에 글자가 없는 경우 (예: wor*d로 word를 찾음)
-			// 2. * 자리에 ?처럼 어떤 글자든지 들어갈 수 있는 경우
-			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
