@@ -119,9 +119,11 @@ public:
 		root = Insert(root, key, val, 0);
 	}
 
+	// "ant"
 	Node* Insert(Node*& node, string key, string val, int d)
 	{
-		if (node == nullptr) node = new Node; // Node*& 포인터에 대한 참조 사용
+		if (node == nullptr)
+			node = new Node; // Node*& 포인터에 대한 참조 사용
 
 		if (d == key.length())
 		{
@@ -261,9 +263,9 @@ public:
 		// wildcard 케이스는 어떻게 처리할 것인가?
 		if (d == pattern.length() && node->value.empty() == false)
 		{
-			cout << "# pattern : " << pattern << endl;
-			cout << "# pre : " << pre << endl;
-			cout << "# node->value : " << node->value << endl << endl;
+			// cout << "# pattern : " << pattern << endl;
+			// cout << "# pre : " << pre << endl;
+			// cout << "# node->value : " << node->value << endl << endl;
 			keys.push_back(pre);
 			
 		}
@@ -275,6 +277,9 @@ public:
 		if (next == '?')
 		{
 			// TODO: ? 자리에 어떤 글자든지 들어올 수 있다 -> 모든 글자에 대해 재귀 호출
+
+			// "an?" => ant and
+			// "an??" => 
 			for (int i = 0; i < this->R ; i++)
 				if (node->children.at(i))
 					CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
@@ -282,11 +287,11 @@ public:
 			// const string pre_str = pattern.substr(0, d);
 			// const string post_str = pattern.substr(d+1, pattern.length());
 			// const string new_pattern = pre_str + post_str;
-			// CollectMatch(node, pre, new_pattern, keys); // <= ?가 들어가는 패턴길이를 줄이면서 재귀 호출하는 방법('?' 개수에 따라 중복 발생 가능)
 			// cout << "pattern : " << pattern << endl; 
 			// cout << "pre_str : " << pre_str << "\t,d : " << d << endl; 
 			// cout << "post_str : " << post_str << "\t,d+1 : " << d+1<< endl;
 			// cout << "new_pattern : " << new_pattern << endl << endl; 
+			// CollectMatch(node, pre, new_pattern, keys); // <= ?가 들어가는 패턴길이를 줄이면서 재귀 호출하는 방법('?' 개수에 따라 중복 발생 가능)
 		}
 		else if (next == '*')
 		{
@@ -304,16 +309,19 @@ public:
 			string pre_str = pattern.substr(0, d);
 			string post_str = pattern.substr(d+1, pattern.length());
 			string new_pattern = pre_str + post_str;
-			cout << "new_pattern case 1 : " << new_pattern << endl; 
+			// cout << "new_pattern case 1 : " << new_pattern << endl; 
 			CollectMatch(node, pre, new_pattern, keys);
 
+			// wor*d => world
+			// wor*d => worl
 			// 2. * 자리에 ?처럼 어떤 글자든지 들어갈 수 있는 경우
 			for (int i = 0; i < this->R ; i++)
 				if (node->children.at(i))
 					CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
+			// cout << "pattern case 2 : " << pattern << endl; 
 
 			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
-			cout << "pattern case 2 : " << pattern << endl; 
+			// wor* => wor + "l" + *
 			pre_str = pattern.substr(0, d);
 			post_str = pattern.substr(d, pattern.length());
 			for (int i = 0; i < this->R ; i++)
@@ -321,12 +329,12 @@ public:
 				if (node->children.at(i))
 				{
 					new_pattern = pre_str + static_cast<char>(i) + post_str;
-					cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
+					// cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
 					CollectMatch(node->children.at(i), pre + static_cast<char>(i), new_pattern, keys);
 				}
 			}
 		}
-		else // "she"
+		else // "ant"
 		{
 			// TODO: 그 외의 일반적인 알파벳일 경우
 			if (node->children.at(next))
@@ -347,9 +355,14 @@ public:
 		return true;
 	}
 
+	/** Delete()
+	 * shells, she
+	 * she를 삭제하는 경우 이미 shells가 있으므로 s, h 노드를 삭제하면 안됨
+	 * 지우고자 하는 단어의 마지막 철자가 있는 노드 다음에 다른 노드가 하나라도 존재하면 삭제하면 안된다.
+	 */
 	Node* Delete(Node* n, string key, int d)
 	{
-		if (!n) return nullptr;
+		if (n == nullptr) return nullptr;
 
 		if (d == key.length())
 		{
@@ -359,6 +372,12 @@ public:
 		{
 			char c = key.at(d);
 			n->children[c] = Delete(n->children[c], key, d + 1);
+		}
+
+		if (IsEmpty(n) && n->value == static_cast<string>(""))
+		{
+			delete n;
+			n = nullptr;
 		}
 
 		//if ( TODO: 자식이 하나도 없고 value도 비어있다면)
@@ -501,7 +520,7 @@ int main()
 		cout << "KeysThatMatch()" << endl;
 		// for (const auto& k : trie.KeysThatMatch("ant"))
 		// for (const auto& k : trie.KeysThatMatch("an?"))
-		for (const auto& k : trie.KeysThatMatch("an????"))
+		for (const auto& k : trie.KeysThatMatch("an???"))
 		{
 			cout << k << " ";
 		}
@@ -551,7 +570,6 @@ int main()
 	// 영어 사전 (사전 파일을 읽어들이는 데에 시간이 약간 걸립니다.)
 	// run_dict();
 
-
 	return 0;
 }
 
@@ -559,7 +577,7 @@ void run_dict()
 {
 	Trie trie;
 
-	ifstream ifile("./eng_dic.txt");
+	ifstream ifile("../eng_dic.txt");
 	int count = 0;
 	while (ifile)
 	{
@@ -570,6 +588,7 @@ void run_dict()
 		if (!key.empty())
 		{
 			trie.Insert(key, value); // trie에 추가
+			// trie.IterInsert(key, value); // trie에 추가
 			count++;
 		}
 	}
