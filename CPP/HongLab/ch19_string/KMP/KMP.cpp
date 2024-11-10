@@ -3,6 +3,11 @@
 #include <string>
 using namespace std;
 
+
+/**
+ * LPS(Longest proper Prefix and Suffix)
+ * abcd
+ */
 vector<int> ComputePrefixFunction(string pat)
 {
 	int M = int(pat.size());
@@ -14,20 +19,22 @@ vector<int> ComputePrefixFunction(string pat)
 
 	for (int i = 1; i < M; i++) // i는 1부터 시작하고 항상 증가
 	{
-		break; // TODO: 삭제
+		// break; // TODO: 삭제
 
 		// while (TODO: k가 0보다 크고 i와 k 자리의 글자들이 서로 다를 경우) // 매칭에 실패했을 경우 k를 되돌리기
+		// 매칭에 실패했을 경우 k를 되돌리기
+		while (k > 0 && pat[k] != pat[i])
 		{
-			//k = TODO;
-			//k = k - 1; // 주의: 이렇게 하면 안되는 이유는?
+			k = lps[k - 1];
+			k = k - 1; // 주의: 이렇게 하면 안되는 이유는?
 		}
 
-		// if (TODO: i와 k 자리의 글자들이 서로 같을 경우)
+		if (pat[k] == pat[i])
 		{
-			//TODO: k 증가
+			k = k + 1;
 		}
 
-		// lps[i] = TODO;
+		lps[i] = k; // 다음 상태 기록?!
 	}
 
 	cout << pat << endl;
@@ -51,26 +58,27 @@ void KMPMatcher(string pat, string txt)
 	int k = 0;
 	for (int i = 0; i < N; i++) // i가 0부터 시작합니다.
 	{
-		break; // TODO: 삭제
+		// break; // TODO: 삭제
 
-		// while(TODO)
-		{
-			// TODO: ComputePrefixFunction() 참고
-		}
+        while (k > 0 && pat[k] != txt[i])
+        {
+            k = lps[k - 1];
+        }
 
-		// if (TODO)
-		{
-			// TODO: ComputePrefixFunction() 참고
-		}
+        if (pat[k] == txt[i])
+        {
+            k += 1;
+        }
 
-		if (k == M) // 매칭이 되었을 경우
-		{
-			for (int s = 0; s < i - (M - 1); s++)
-				cout << " ";
-			cout << pat << " " << i - (M - 1) << endl;
+        if (k == M)
+        {
+            for (int s = 0; s < i - (M - 1); s++)
+                cout << " ";
+            cout << pat << " " << i - (M - 1) << endl;
 
-			// k = TODO; // 모든 글자가 매칭된 경우에도 다음 매칭을 위해 k를 되돌림
-		}
+            k = lps[k - 1]; // 모든 글자가 매칭된 경우에도 다음 매칭을 위해 k를 되돌림
+        }
+
 	}
 
 	cout << endl;
