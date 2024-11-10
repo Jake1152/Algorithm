@@ -26,7 +26,7 @@ vector<int> ComputePrefixFunction(string pat)
 		while (k > 0 && pat[k] != pat[i])
 		{
 			k = lps[k - 1];
-			k = k - 1; // 주의: 이렇게 하면 안되는 이유는?
+			// k = k - 1; // 주의: 이렇게 하면 안되는 이유는?
 		}
 
 		if (pat[k] == pat[i])
