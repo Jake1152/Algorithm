@@ -6,7 +6,10 @@ using namespace std;
 // 아래 구현은 CLRS 4th p.974을 유사하게 이해하기 쉽도록 정리한 것입니다.
 // C 스타일의 보다 효율적인 구현은 아래 링크 참고하세요. (영상 밑에 해설 참고하세요)
 // https://www.geeksforgeeks.org/finite-automata-algorithm-for-pattern-searching/
-
+/**
+ * 패턴을 기준으로 현재 상태에서 입력 값에 따라 다음 상태를 알려준다.
+ * 패턴 길이를 기준으로 한다.
+ */
 void ComputeTransitionFunction(string pat, vector<vector<int>>& TF) // TF reference
 {
 	int M = int(pat.size());
@@ -23,21 +26,32 @@ void ComputeTransitionFunction(string pat, vector<vector<int>>& TF) // TF refere
 		{
 			int k = std::min(M, state + 1); // 상태는 M보다 클 수 없다
 
+			// TO KNOW: k를 갱신하는 이유?, 3중 for문이라서 k값이 패턴 길이보다 길어지는 경우가 있어서?
+			// 어느 경우의 k값이 패턴 길이보다 길어지는가?
+
 			while (k > 0) // k == 0 이라면 한 글자도 매칭이 안되었다는 의미
 			{
+				// pat[state]
 				// 문자열 연산 힌트 substr(), += char(x)
 				// string prefix = TODO;     // 패턴의 앞에서부터 k 글자
 				// string suffix = TODO;     // [현재 상태로 오기위해 입력받은 문자열 + 새로운 글자]의 뒷부분 k 글자
+				string prefix = pat.substr(0, k);
+				string suffix = pat.substr(0, state);
+				suffix += char(x); // 새로 들어올 글자 추가
+				suffix = suffix.substr(suffix.size() - k, k); // 입력 문자열의 뒤에서부터 k글자
 
 				// suffix를 3줄로 나눠서 구현하는 경우
-				// string suffix = TODO; // 현재 상태로 오기위해 입력받은 문자열
-				// suffix += TODO;       // 새로 들어올 글자 추가
-				// suffix = TODO;        // 입력 문자열의 뒤에서부터 k 글자
+				// string suffix = pat.substr(0, state);
+				// suffix = char(x); // 현재 상태로 오기위해 입력받은 문자열
+				// suffix += suffix.substr(suffix.size() - k, k);       // 새로 들어올 글자 추가
 
-				//if (prefix == suffix)
-				//	break;
+				// string suffix = pat.substr(state - (k - 1), k - 1) + char(x); // 한줄로 줄인 구현
+
+				if (prefix == suffix)
+					break;
 
 				k = k - 1; // 길이 k인 경우에 매칭 실패,더 짦은 경우에 대해 시도
+				cout << "k : " << k << ",\tprefix : " << prefix << ",\tsuffix : " << suffix << endl;
 			}
 
 			TF[state][x] = k;
@@ -102,10 +116,10 @@ void FiniteAutomatonMatcher(string pat, string txt)
 
 int main()
 {
-	string txt = "aabaacaadaabaaabaa";
-	string pat = "aaba";
-	//string txt = "abababcabababab";
-	//string pat = "abab";
+	// string txt = "aabaacaadaabaaabaa";
+	// string pat = "aaba";
+	string txt = "abababcabababab";
+	string pat = "abab";
 
 	FiniteAutomatonMatcher(pat, txt); // 중복 매치 가능
 
