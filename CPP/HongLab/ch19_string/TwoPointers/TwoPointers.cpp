@@ -22,19 +22,19 @@ int main()
 
 	while (i < j)
 	{
-		// cout << i << " " << j << endl;
+		cout << i << " " << j << endl;
 
 		if (arr[i] + arr[j] == target)
 		{
 			cout << arr[i] << " + " << arr[j] << " = " << target << endl;
 			return 0;
 		}
-		//else if (arr[i] + arr[j] < target)
-		//	TODO:
-		//else // if (arr[i] + arr[j] > target)
-		//	TODO:
+		else if (arr[i] + arr[j] < target)
+			i++;
+		else // if (arr[i] + arr[j] > target)
+			j--;
 
-		break; // 무한 반복 방지 (TODO: 삭제하세요)
+		// break; // 무한 반복 방지 (TODO: 삭제하세요)
 	}
 
 	return 0;
