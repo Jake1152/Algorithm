@@ -26,10 +26,13 @@ void ExplicitBackupStringSearch(string& pat, string& txt)
 		{
 			// TODO: i 업데이트
 			// TODO: j 업데이트
+			i++;
+			j++;
 		}
 		else // 그렇지 않으면 i와 j 둘 다 후퇴
 		{
 			// TODO: i 업데이트
+			i -= (j - 1);
 			j = 0; // Brute-Force 방식입니다. 더 효율적인 방식은 뒤에 KMP에서 사용합니다.
 		}
 
@@ -42,10 +45,11 @@ void ExplicitBackupStringSearch(string& pat, string& txt)
 			// i와 j 둘 다 다음 매칭을 위해 후퇴 
 
 			// TODO: i 업데이트
+			i -= M - 1;
 			j = 0; // Brute-Force 방식입니다. 더 효율적인 방식은 뒤에 KMP에서 사용합니다.
 		}
 
-		break; // TODO: 무한루프 방지, 삭제
+		// break; // TODO: 무한루프 방지, 삭제
 	}
 
 	cout << endl;
