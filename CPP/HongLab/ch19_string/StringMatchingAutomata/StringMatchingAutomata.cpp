@@ -22,6 +22,7 @@ void ComputeTransitionFunction(string pat, vector<vector<int>>& TF) // TF refere
 	// - TF[state][x]는 상태s(= s개가 이미 매칭된 상태)에 추가로 x가 더 들어오는 경우를 의미합니다.
 
 	for (int state = 0; state <= M; ++state)     // 상태 state에서
+	{
 		for (int x = 32; x < d; ++x)             // 글자 x가 들어오면 (ASCII 32 미만은 패턴에 사용되지 않는다고 가정)
 		{
 			int k = std::min(M, state + 1); // 상태는 M보다 클 수 없다
@@ -56,6 +57,7 @@ void ComputeTransitionFunction(string pat, vector<vector<int>>& TF) // TF refere
 
 			TF[state][x] = k;
 		}
+	}
 }
 
 void PrintTransitionFunction(vector<vector<int>>& tf)

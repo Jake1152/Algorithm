@@ -46,9 +46,26 @@ public:
 	{
 		return Select(root, k);
 	}
+	/**
+	 * 힌트 1: Node에 저장되어 있는 size를 사용하면 편합니다.
+	   힌트 2: 26 노드의 크기는 10입니다. 26 노드의 왼쪽 자식의 크기는 6이고 오른쪽 자식의 크기는 3입니다. 
+				10 = 6 + 3 + 1과 일치합니다. 
+				마지막 + 1은 자기 자신 하나를 더하는 것입니다.
+	   힌트 3: 오른쪽 자식에 대해서 k - r (Rank() 에서는 살짝 바꿔서 적용됩니다.)
+	 */
 	Node* Select(Node* n, int k)
 	{
-		return nullptr;	// TODO: 
+		if (n == nullptr) return nullptr;
+
+		// 왼쪽 서브트리가 없으면 1, 있으면 왼쪽 서브트리 사이즈 + 1
+		int r = n->left ? n->left->size + 1 : 1;
+
+		if (k == r)
+			return n;
+		else if (k < r)
+			return Select(n->left, k);
+		else
+			return Select(n->right, k - r);
 	}
 
 	// key가 같은 노드가 여러 개일 경우에는 아무거나 허용

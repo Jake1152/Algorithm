@@ -263,11 +263,10 @@ public:
 		// wildcard 케이스는 어떻게 처리할 것인가?
 		if (d == pattern.length() && node->value.empty() == false)
 		{
-			// cout << "# pattern : " << pattern << endl;
-			// cout << "# pre : " << pre << endl;
-			// cout << "# node->value : " << node->value << endl << endl;
+			cout << "# pattern : " << pattern << endl;
+			cout << "# pre : " << pre << endl;
+			cout << "# node->value : " << node->value << endl << endl;
 			keys.push_back(pre);
-			
 		}
 
 		if (d == pattern.length()) return;
@@ -309,7 +308,7 @@ public:
 			string pre_str = pattern.substr(0, d);
 			string post_str = pattern.substr(d+1, pattern.length());
 			string new_pattern = pre_str + post_str;
-			// cout << "new_pattern case 1 : " << new_pattern << endl; 
+			cout << "new_pattern case 1 : " << new_pattern << endl; 
 			CollectMatch(node, pre, new_pattern, keys);
 
 			// wor*d => world
@@ -318,7 +317,7 @@ public:
 			for (int i = 0; i < this->R ; i++)
 				if (node->children.at(i))
 					CollectMatch(node->children.at(i), pre + static_cast<char>(i), pattern, keys);
-			// cout << "pattern case 2 : " << pattern << endl; 
+			cout << "pattern case 2 : " << pattern << endl; 
 
 			// 3. * 자리에 여러 글자가 들어가는 경우 (예: wor*d로 world, worried 등을 찾음)
 			// wor* => wor + "l" + *
@@ -329,7 +328,7 @@ public:
 				if (node->children.at(i))
 				{
 					new_pattern = pre_str + static_cast<char>(i) + post_str;
-					// cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
+					cout << "new_pattern case 3 : " << new_pattern << endl << endl; 
 					CollectMatch(node->children.at(i), pre + static_cast<char>(i), new_pattern, keys);
 				}
 			}
@@ -379,12 +378,6 @@ public:
 			delete n;
 			n = nullptr;
 		}
-
-		//if ( TODO: 자식이 하나도 없고 value도 비어있다면)
-		//{
-		//	// TODO: 메모리 삭제
-		//	n = nullptr;
-		//}
 
 		return n;
 	}
@@ -520,7 +513,7 @@ int main()
 		cout << "KeysThatMatch()" << endl;
 		// for (const auto& k : trie.KeysThatMatch("ant"))
 		// for (const auto& k : trie.KeysThatMatch("an?"))
-		for (const auto& k : trie.KeysThatMatch("an???"))
+		for (const auto& k : trie.KeysThatMatch("an??"))
 		{
 			cout << k << " ";
 		}
@@ -568,7 +561,7 @@ int main()
 	}
 
 	// 영어 사전 (사전 파일을 읽어들이는 데에 시간이 약간 걸립니다.)
-	// run_dict();
+	run_dict();
 
 	return 0;
 }
