@@ -58,21 +58,29 @@ public:
 		if (n == nullptr) return nullptr;
 
 		// 왼쪽 서브트리가 없으면 1, 있으면 왼쪽 서브트리 사이즈 + 1
-		int r = n->left ? n->left->size + 1 : 1;
+		int rank = n->left ? n->left->size + 1 : 1;
 
-		if (k == r)
+		if (k == rank)
 			return n;
-		else if (k < r)
+		else if (k < rank)
 			return Select(n->left, k);
 		else
-			return Select(n->right, k - r);
+			return Select(n->right, k - rank);
 	}
 
 	// key가 같은 노드가 여러 개일 경우에는 아무거나 허용
 	int Rank(Key key) { return Rank(root, key); }
 	int Rank(Node* n, Key key)
 	{
-		return -1; // TODO:
+		if (n == nullptr)
+			return -1;
+		int rank = n->left ? n->left->size + 1 : 1;
+		if (n->key == key)
+			return rank;
+		else if (key < n->key)
+			return Rank(n->left, key);
+		else
+			return rank + Rank(n->right, key);
 	}
 
 	// 참고: CLRS 교재의 OS-RANK()는 각 노드가 부모 포인터를 갖고 있는 경우에 대해 구현되어 있어서
