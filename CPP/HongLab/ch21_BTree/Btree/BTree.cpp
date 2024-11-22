@@ -37,8 +37,8 @@ public:
 		}
 	};
 
-	Node* root = nullptr;
-	int t; // 최소 차수 (minimum degree)
+	Node* _root = nullptr;
+	int _minimum_degree; // 최소 차수 (minimum degree)
 
 	// 최소 차수 규칙
 	// - 루트 외의 노드들은 키(key)를 최소 t - 1개 저장
@@ -46,16 +46,16 @@ public:
 	// - n = 2t - 1인 노드는 분할 가능
 
 	BTree(int t)
-		: t(t)
+		: _minimum_degree(t)
 	{
-		root = new Node(t, true); // 처음 만들어진 루트 노드는 자식이 없기 때문에 리프노드
+		this->_root = new Node(t, true); // 처음 만들어진 루트 노드는 자식이 없기 때문에 리프노드
 
-		// DiskWrite(root); 디스크에 저장 (예제에서는 디스크 입출력을 생략하였습니다.)
+		// DiskWrite(this->_root); 디스크에 저장 (예제에서는 디스크 입출력을 생략하였습니다.)
 	}
 
 	~BTree()
 	{
-		RemoveChildren(root);
+		RemoveChildren(this->_root);
 	}
 
 	void RemoveChildren(Node*& x)
@@ -75,26 +75,27 @@ public:
 
 	void Insert(T_KEY k)
 	{
-		if (root->n == 2 * t - 1)
+		if (this->_root->n == 2 * _minimum_degree - 1)
 		{
-			SplitRoot();
+			Split_Root();
 
-			InsertNonfull(root, k);
+			InsertNonfull(this->_root, k);
 		}
 		else
-			InsertNonfull(root, k);
+			InsertNonfull(this->_root, k);
 	}
 
-	void SplitRoot()
+	void Split_Root()
 	{
-		Node* s = new Node(t, false); // 빈 노드를 새로 루트로 만들고
+		Node* s = new Node(_minimum_degree, false); // 빈 노드를 새로 루트로 만들고
+		
 
-		s->children[0] = root;        // 원래 루트는 그 노드의 첫 번째 자식으로 지정
+		s->children[0] = this->_root;        // 원래 루트는 그 노드의 첫 번째 자식으로 지정
 
-		SplitChild(s, 0); // s의 children[0]을 쪼갠다 (결국 예전 root를 쪼개는 것)
+		SplitChild(s, 0); // s의 children[0]을 쪼갠다 (결국 예전 this->_root를 쪼개는 것)
 		// 쪼갤때 부모로 하나 올려줘야 하기 때문에 부모 포인터를 넣어줍니다.
 
-		root = s;
+		this->_root = s;
 	}
 
 	void InsertNonfull(Node* x, T_KEY k)
@@ -149,9 +150,9 @@ public:
 	void SplitChild(Node* x, int i)
 	{
 		Node* y = x->children[i];
-		Node* z = new Node(t, y->leaf);
+		Node* z = new Node(_minimum_degree, y->leaf);
 
-		z->n = t - 1;
+		z->n = this->_minimum_degree - 1;
 
 		//for (TODO: ) // y의 마지막 t - 1개의 키(key)들을 z로 복사
 		//	z->keys[j] = TODO;
@@ -162,7 +163,7 @@ public:
 			//	z->children[j] = TODO;
 		}
 
-		y->n = t - 1; // n의 개수를 줄인다는 것은 z로 옮긴 것들을 y에서 뺀다는 의미
+		y->n = this->_minimum_degree - 1; // n의 개수를 줄인다는 것은 z로 옮긴 것들을 y에서 뺀다는 의미
 
 		// 부모 x에 새로운 자식 노드가 추가되어야 하기 때문에 하나씩 밀어서 빈 자리 마련
 		//for (TODO:)
@@ -174,24 +175,24 @@ public:
 		//for (TODO:)
 		//	x->keys[j + 1] = x->keys[j];
 
-		x->keys[i] = y->keys[t - 1]; // y의 가운데 키를 x로 이동
+		x->keys[i] = y->keys[this->_minimum_degree - 1]; // y의 가운데 키를 x로 이동
 
 		x->n += 1; // 하나 증가
 	}
 
 	void Delete(T_KEY k)
 	{
-		if (root)
+		if (this->_root)
 		{
-			Delete(root, k);
+			Delete(this->_root, k);
 
-			if (root->n == 0) // 삭제 후 루트가 비었다면 첫번째 자식을 루트로 교체
+			if (this->_root->n == 0) // 삭제 후 루트가 비었다면 첫번째 자식을 루트로 교체
 			{
-				Node* temp = root;
-				if (root->leaf)
-					root = nullptr;
+				Node* temp = this->_root;
+				if (this->_root->leaf)
+					this->_root = nullptr;
 				else
-					root = root->children[0];
+					this->_root = this->_root->children[0];
 
 				delete temp;
 			}
@@ -292,7 +293,7 @@ public:
 		// 이 노드의 개수를 유지하기 위해서
 		// 삭제하려는 키보다 작은쪽의 서브트리와 바꿔치기하고 그 쪽에서 삭제하게 합니다.
 		// 자식 서브트리로 책임을 미루는 느낌입니다. Case 2a
-		if (x->children[idx]->n >= t)
+		if (x->children[idx]->n >= this->_minimum_degree)
 		{
 			T_KEY pred = GetPred(x, idx);   // 바꿔치기할 값을 가져옵니다.
 			x->keys[idx] = pred;            // 삭제할 키 자리에 덮어쓰고
@@ -302,7 +303,7 @@ public:
 		// 이 노드의 개수를 유지하기 위해서
 		// 삭제하려는 키보다 큰쪽의 서브트리와 바꿔치기하고 그 쪽에서 삭제하게 합니다.
 		// 자식 서브트리로 책임을 미루는 느낌입니다. Case 2b
-		else if (x->children[idx + 1]->n >= t)
+		else if (x->children[idx + 1]->n >= this->_minimum_degree)
 		{
 			//TODO;        // 바꿔치기할 값을 가져옵니다.
 			//TODO;        // 삭제할 키 자리에 덮어쓰고
@@ -421,17 +422,17 @@ public:
 		Node* sibling = x->children[idx + 1];
 
 		// 부모 x의 키들 중에서 두 자식에 대한 포인터 사이에 껴있는 것도 자식으로 옮깁니다.
-		child->keys[t - 1] = x->keys[idx];
+		child->keys[this->_minimum_degree - 1] = x->keys[idx];
 
 		// x->children[idx + 1]의 키들을 모두 x->children[idx]로 복사합니다.
 		for (int i = 0; i < sibling->n; ++i)
-			child->keys[i + t] = sibling->keys[i];
+			child->keys[i + this->_minimum_degree] = sibling->keys[i];
 
 		// 리프 노드가 아니라면 자식 포인터도 복사합니다.
 		if (!child->leaf)
 		{
 			for (int i = 0; i <= sibling->n; ++i)
-				child->children[i + t] = sibling->children[i];
+				child->children[i + this->_minimum_degree] = sibling->children[i];
 		}
 
 		// 부모 x의 키들 중에서 하나를 자식으로 옮겼기 때문에 빈 자리를 메웁니다.
@@ -452,7 +453,7 @@ public:
 
 	void TraversePrint()
 	{
-		TraversePrint(root);
+		TraversePrint(this->_root);
 		cout << endl;
 	}
 
@@ -490,16 +491,16 @@ public:
 
 	void DisplayTree() // Inorder traverse
 	{
-		if (!root)
+		if (!this->_root)
 		{
 			cout << "Empty" << endl;
 			cout << endl;
 			return;
 		}
 
-		vector<string> log(Height(root) + 1, string(Size(root) * 4, ' '));
+		vector<string> log(Height(this->_root) + 1, string(Size(this->_root) * 4, ' '));
 		int start = 0;
-		DisplayTree(root, 0, start, log);
+		DisplayTree(this->_root, 0, start, log);
 
 		for (string s : log)
 			cout << s << endl;
@@ -578,12 +579,12 @@ int main()
 	// CLRS 예제 (키가 문자형)
 	{
 		BTree<char> bt(3);
-		bt.root = new BTree<char>::Node(bt.t, false, "GMPX"); // CLRS 예제와 같은 상황을 만들기 위해 수동으로 트리 초기화
-		bt.root->children[0] = new BTree<char>::Node(bt.t, true, "ACDE");
-		bt.root->children[1] = new BTree<char>::Node(bt.t, true, "JK");
-		bt.root->children[2] = new BTree<char>::Node(bt.t, true, "NO");
-		bt.root->children[3] = new BTree<char>::Node(bt.t, true, "RSTUV");
-		bt.root->children[4] = new BTree<char>::Node(bt.t, true, "YZ");
+		bt._root = new BTree<char>::Node(bt._minimum_degree, false, "GMPX"); // CLRS 예제와 같은 상황을 만들기 위해 수동으로 트리 초기화
+		bt._root->children[0] = new BTree<char>::Node(bt._minimum_degree, true, "ACDE");
+		bt._root->children[1] = new BTree<char>::Node(bt._minimum_degree, true, "JK");
+		bt._root->children[2] = new BTree<char>::Node(bt._minimum_degree, true, "NO");
+		bt._root->children[3] = new BTree<char>::Node(bt._minimum_degree, true, "RSTUV");
+		bt._root->children[4] = new BTree<char>::Node(bt._minimum_degree, true, "YZ");
 
 		bt.DisplayTree();
 

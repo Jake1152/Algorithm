@@ -75,6 +75,9 @@ public:
 		assert(l2 <= h2);
 
 		// if ( TODO: ) return true;
+		// 겹치는 경우
+		if (l1 <= h2 && l2 <= h1)
+			return true;
 		return false;
 	}
 
@@ -82,13 +85,15 @@ public:
 	{
 		Node* n = root;
 
-		//while (n != nullptr && !Overlap(n->low, n->high, low, high))
-		//{
-		//	if (n->left != nullptr && TODO: 조건 추가)
-		//		n = n->left;
-		//	else
-		//		n = n->right;
-		//}
+		// 현재 노드가 있고, 범위에 들어가 있을 때,
+		while (n != nullptr && Overlap(n->low, n->high, low, high) == false)
+		{
+			
+			if (n->left != nullptr && low <= n->left->max_high )
+				n = n->left;
+			else
+				n = n->right;
+		}
 
 		// 편의상 여기서 출력
 		cout << "[" << low << "," << high << "] overlaps: ";
@@ -160,7 +165,9 @@ public:
 		assert(h->size == RecurSize(h));
 
 		// h->max_high = TODO: max_high 업데이트
-		// assert(h->max_high == RecurMaxHigh(h));
+		// 현재 노드, 왼쪽 서브트리, 오른쪽 서브트리 high값의 max를 갱신
+		h->max_high = std::max(h->high, std::max(MaxHigh(h->left), MaxHigh(h->right)));
+		assert(h->max_high == RecurMaxHigh(h));
 
 		// x->size, x->max_high는 Balance() 마지막에 다시 수정
 
@@ -180,7 +187,9 @@ public:
 		assert(h->size == RecurSize(h));
 
 		// h->max_high = TODO: max_high 업데이트
-		// assert(h->max_high == RecurMaxHigh(h));
+		// 현재 노드, 왼쪽 서브트리, 오른쪽 서브트리 high값의 max를 갱신
+		h->max_high = std::max(h->high, std::max(MaxHigh(h->left), MaxHigh(h->right)));
+		assert(h->max_high == RecurMaxHigh(h));
 
 		// x->size, x->max_high는 Balance() 마지막에 다시 수정
 
@@ -214,6 +223,8 @@ public:
 		assert(h->size == RecurSize(h));
 
 		// h->max_high = TODO: max_high 업데이트
+		// 현재 노드, 왼쪽 서브트리, 오른쪽 서브트리 high값의 max를 갱신
+		h->max_high = std::max(h->high, std::max(MaxHigh(h->left), MaxHigh(h->right)));
 		// assert(h->max_high == RecurMaxHigh(h));
 
 		return h;
