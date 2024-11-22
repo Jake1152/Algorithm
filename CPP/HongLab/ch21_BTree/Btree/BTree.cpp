@@ -147,32 +147,43 @@ public:
 
 	// x->children[i]를 쪼갠다
 	// 쪼개는 과정에서 부모 노드로 하나씩 옮기기 때문에 children[i]의 포인터가 아니라 부모 x의 포인터 전달
+	/**
+	 * x,y,z란 무엇인가?
+	 * 
+	 * x는 부모노드
+	 * y는 자식노드 
+	 * z는 새로 만든 노드
+	 *   왜 y노드의 y->leaf와 z노드의 leaf를 동일하게 만드는가?
+	 */
 	void SplitChild(Node* x, int i)
 	{
 		Node* y = x->children[i];
 		Node* z = new Node(_minimum_degree, y->leaf);
 
+		// 현재 키 개수 설정 t - 1개로 맞추는 작업
 		z->n = this->_minimum_degree - 1;
 
-		//for (TODO: ) // y의 마지막 t - 1개의 키(key)들을 z로 복사
-		//	z->keys[j] = TODO;
+		// t번 인덱스부터 끝까지 반복
+		for (size_t j = 0; j < this->_minimum_degree; j++) // y의 마지막 t - 1개의 키(key)들을 z로 복사
+			z->keys[j] = y->keys[j + this->_minimum_degree];
 
 		if (y->leaf == false) // 리프노드가 아니라면 자식들도 복사
 		{
-			//for (TODO:)
-			//	z->children[j] = TODO;
+			for (size_t j = 0; j < this->_minimum_degree; j++) // y의 마지막 t - 1개의 키(key)들을 z로 복사
+				z->children[j] = y->children[j + this->_minimum_degree];
 		}
 
 		y->n = this->_minimum_degree - 1; // n의 개수를 줄인다는 것은 z로 옮긴 것들을 y에서 뺀다는 의미
 
 		// 부모 x에 새로운 자식 노드가 추가되어야 하기 때문에 하나씩 밀어서 빈 자리 마련
+		// 빈 자리는 어디가 될까? i값까지?
 		//for (TODO:)
 		//	x->children[j + 1] = x->children[j];
 
 		x->children[i + 1] = z; // 빈 자리에 z를 새로운 자식으로 추가
 
 		// y의 중간 키를 x로 이동하기 위해 빈 자리 마련
-		//for (TODO:)
+		// for (TODO:)
 		//	x->keys[j + 1] = x->keys[j];
 
 		x->keys[i] = y->keys[this->_minimum_degree - 1]; // y의 가운데 키를 x로 이동
