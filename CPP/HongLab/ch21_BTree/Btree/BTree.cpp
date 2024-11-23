@@ -110,6 +110,7 @@ public:
 				x->keys[i + 1] = x->keys[i];
 				i = i - 1;
 			}
+			// 왜 i가 아니라 i + 1인가?
 			x->keys[i + 1] = k;
 			x->n += 1;
 
@@ -154,6 +155,7 @@ public:
 	 * y는 자식노드 
 	 * z는 새로 만든 노드
 	 *   왜 y노드의 y->leaf와 z노드의 leaf를 동일하게 만드는가?
+	 * i 값은 쪼개질 노드를 의미
 	 */
 	void SplitChild(Node* x, int i)
 	{
@@ -177,14 +179,16 @@ public:
 
 		// 부모 x에 새로운 자식 노드가 추가되어야 하기 때문에 하나씩 밀어서 빈 자리 마련
 		// 빈 자리는 어디가 될까? i값까지?
-		//for (TODO:)
-		//	x->children[j + 1] = x->children[j];
+		// 뒤에서 앞으로 와야함..!
+		for (int j = i; j <= this->_minimum_degree - 1; j++)
+			x->children[j + 1] = x->children[j];
 
 		x->children[i + 1] = z; // 빈 자리에 z를 새로운 자식으로 추가
 
 		// y의 중간 키를 x로 이동하기 위해 빈 자리 마련
-		// for (TODO:)
-		//	x->keys[j + 1] = x->keys[j];
+		// for ()
+		for (int j = x->n - 1; j >= i; j -= 1)
+			x->keys[j + 1] = x->keys[j];
 
 		x->keys[i] = y->keys[this->_minimum_degree - 1]; // y의 가운데 키를 x로 이동
 
