@@ -131,18 +131,20 @@ public:
 			// 그래서 아래에서는 i + 1 사용
 
 			// DiskRead(x->children[x + 1])  // 디스크에서 읽어들이기
-
 			//if (TODO: 여기 들어갈 조건은? ) // 꽉 찼다면 쪼갠 후에 삽입
-			//{
-			//	SplitChild(x, i + 1);
+			
+			// if (x->keys.size() > this->_minimum_degree * 2 - 1)
+			if (x->children[i + 1]->n == this->_minimum_degree * 2 - 1)
+			{
+				SplitChild(x, i + 1);
 
-			//	// 쪼갠 후에는 x->keys[i+1]이 바뀌었기 때문에
-			//	// 저장 위치가 그 키의 전인지 후인지를 업데이트 해야 함
-			//	if (x->keys[i + 1] < k)
-			//		i = i + 1;
-			//}
+				// 쪼갠 후에는 x->keys[i+1]이 바뀌었기 때문에
+				// 저장 위치가 그 키의 전인지 후인지를 업데이트 해야 함
+				if (x->keys[i + 1] < k)
+					i = i + 1;
+			}
 
-			// InsertNonfull(x->children[i + 1], k); // 키 삽입
+			InsertNonfull(x->children[i + 1], k); // 키 삽입
 		}
 	}
 
@@ -166,7 +168,8 @@ public:
 		z->n = this->_minimum_degree - 1;
 
 		// t번 인덱스부터 끝까지 반복
-		for (size_t j = 0; j < this->_minimum_degree; j++) // y의 마지막 t - 1개의 키(key)들을 z로 복사
+		// for (size_t j = 0; j < this->_minimum_degree; j++) // y의 마지막 t - 1개의 키(key)들을 z로 복사
+		for (size_t j = 0; j < this->_minimum_degree - 1; j++) // y의 마지막 t - 1개의 키(key)들을 z로 복사
 			z->keys[j] = y->keys[j + this->_minimum_degree];
 
 		if (y->leaf == false) // 리프노드가 아니라면 자식들도 복사
@@ -180,7 +183,8 @@ public:
 		// 부모 x에 새로운 자식 노드가 추가되어야 하기 때문에 하나씩 밀어서 빈 자리 마련
 		// 빈 자리는 어디가 될까? i값까지?
 		// 뒤에서 앞으로 와야함..!
-		for (int j = i; j <= this->_minimum_degree - 1; j++)
+		// for (int j = i; j <= this->_minimum_degree - 1; j++)
+		for (int j = x->n; j >= i + 1; j -= 1)
 			x->children[j + 1] = x->children[j];
 
 		x->children[i + 1] = z; // 빈 자리에 z를 새로운 자식으로 추가
