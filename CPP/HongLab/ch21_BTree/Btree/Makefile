@@ -1,6 +1,6 @@
 NAME = BTree
 CXX = g++
-CXXFLAGS = -g -std=c++11#-Wall -Wextra -Werror
+CXXFLAGS = -g -std=c++17#-Wall -Wextra -Werror
 RM = rm -f
 
 SRCS = BTree.cpp

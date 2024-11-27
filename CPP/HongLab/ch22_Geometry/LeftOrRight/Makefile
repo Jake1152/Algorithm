@@ -1,19 +1,20 @@
 NAME = LeftOrRight
 CXX = g++
-CXXFLAGS = -g -std=c++11 $(FLAGS) #-Wall -Wextra -Werror
+CXXFLAGS = -g -std=c++17 #-Wall -Wextra -Werror
 RM = rm -f
 
 SRCS = LeftOrRight.cpp
 
-# g++ LeftOrRight.cpp -o a.out $(pkg-config --cflags --libs opencv4)
-
 OBJS = $(SRCS:.cpp=.o)
 
+# OpenCV 플래그 추가
+OPENCV_FLAGS = $(shell pkg-config --cflags --libs opencv4)
+
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
+	$(CXX) $(CXXFLAGS) $(OPENCV_FLAGS) -c $^ -o $@
 
 $(NAME) : $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(OBJS) $(OPENCV_FLAGS) -o $@
 
 all : $(NAME)
 

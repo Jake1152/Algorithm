@@ -344,7 +344,7 @@ public:
 	T_KEY GetSucc(Node* x, int idx)
 	{
 		Node* cur = x->children[idx + 1];
-		while (!cur->leaf)
+		while (cur->leaf == false)
 			cur = cur->children[0];
 		return cur->keys[0];
 	}

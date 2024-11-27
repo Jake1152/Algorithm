@@ -16,7 +16,9 @@ int Direction(Point p0, Point p1, Point p2)
 	int y1 = p1.y;
 	int y2 = p2.y;
 
-	return true; // TODO: 벡터곱(vector product, cross product) 사용
+	return (x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0);
+
+	//return true; // TODO: 벡터곱(vector product, cross product) 사용
 }
 
 void DrawArrow(cv::Mat& image, Point line_start, Point line_end, Scalar color)
