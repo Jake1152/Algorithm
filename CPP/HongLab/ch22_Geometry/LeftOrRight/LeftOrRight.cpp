@@ -21,10 +21,10 @@ int Direction(Point p0, Point p1, Point p2)
 	//return true; // TODO: 벡터곱(vector product, cross product) 사용
 }
 
-void DrawArrow(cv::Mat& image, Point line_start, Point line_end, Scalar color)
+void DrawArrow(cv::Mat& image, Point line_start, Point line_end, cv::Scalar color)
 {
 	cv::Point temp = line_end - line_start;
-	cv::line(image, line_start - temp * 1000, line_start + temp * 1000, Scalar(200, 200, 200), 1, LINE_AA);
+	cv::line(image, line_start - temp * 1000, line_start + temp * 1000, cv::Scalar(200, 200, 200), 1, LINE_AA);
 	cv::circle(image, line_start, 5, color, -1, LINE_AA);
 	cv::arrowedLine(image, line_start, line_end, color, 1, LINE_AA);
 }
@@ -41,8 +41,8 @@ int main(int argc, char** argv)
 
 	vector<Point> points;
 
-	//for (int i = 0; i < 30; i++)
-	//	points.push_back(Point(rand() % image.cols, rand() % image.rows));
+	for (int i = 0; i < 30; i++)
+		points.push_back(Point(rand() % image.cols, rand() % image.rows));
 
 	points.push_back(Point(500, 500));
 
@@ -52,25 +52,28 @@ int main(int argc, char** argv)
 	while (true)
 	{
 		hlab::preframe(); // 그리기 준비 작업
+		std::cout << "After hlab::preframe()" << std::endl;
 
 		for (Point p : points)
 		{
 			// 양수면 왼쪽, 음수면 오른쪽, 0이면 직선 위에
 			int cross = Direction(line_start, line_end, p);
 
-			Scalar color = cross == 0 ? kBlack : cross > 0 ? kRed : kBlue;
+			cv::Scalar color = cross == 0 ? kBlack : cross > 0 ? kRed : kBlue;
 
 			cv::circle(image, p, 15, color, -1, LINE_AA);
 		}
-
+		std::cout << "After for loop" << std::endl;
 		// 마우스로 클릭한 물체 가장자리 그리기
 		if (selected)
-			cv::circle(image, *selected, 17, Scalar(0, 255, 0), 1, LINE_AA);
+			cv::circle(image, *selected, 17, cv::Scalar(0, 255, 0), 1, LINE_AA);
 
 		// 화살표 그리기
-		DrawArrow(image, line_start, line_end, Scalar(30, 30, 30));
+		DrawArrow(image, line_start, line_end, cv::Scalar(30, 30, 30));
+		std::cout << "After DrawArrow()" << std::endl;
 
 		if (hlab::postframe()) break; // 그린 후에 마무리 작업, ESC 누르면 종료
+		std::cout << "After hlab::postframe()" << std::endl;
 	}
 
 	return 0;
