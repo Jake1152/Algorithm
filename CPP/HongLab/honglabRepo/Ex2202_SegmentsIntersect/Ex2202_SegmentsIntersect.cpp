@@ -24,10 +24,8 @@ bool SegmentsIntersect(Point p1, Point p2, Point p3, Point p4) // Segment-Segmen
 	int d3 = Direction(p1, p2, p3);
 	int d4 = Direction(p1, p2, p4);
 
-	if ((d1 > 0 && d2 < 0) or
-		(d1 < 0 && d2 > 0) or
-		(d3 > 0 && d4 < 0) or
-		(d3 < 0 && d4 > 0))
+	if (((d1 > 0 && d2 < 0) or (d1 < 0 && d2 > 0)) and 
+		((d3 > 0 && d4 < 0) or (d3 < 0 && d4 > 0)))
 		return true;
 	else if (d1 == 0 and OnSegment(p3, p4, p1))
 		return true;
@@ -37,7 +35,8 @@ bool SegmentsIntersect(Point p1, Point p2, Point p3, Point p4) // Segment-Segmen
 		return true;
 	else if (d4 == 0 and OnSegment(p1, p2, p4))
 		return true;
-	return false; // TODO: 구현
+	else
+		return false; // TODO: 구현
 }
 
 // https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
@@ -49,8 +48,11 @@ bool Intersection(Point o1, Point p1, Point o2, Point p2, Point& r)
 	Point d2 = p2 - o2;
 
 	int cross = d1.x * d2.y - d1.y * d2.x;
-	if (abs(cross) < 1)
+	if (cross == 0)
 		return false;
+
+	double t1 = (x.x * d2.y - x.y * d2.x) / static_cast<double>(cross);
+	r = o1 + d1 * t1;
 	return true; // TODO: 구현
 }
 
