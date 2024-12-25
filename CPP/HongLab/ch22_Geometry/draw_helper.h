@@ -147,9 +147,11 @@ namespace hlab
 		cv::flip(image, image, 0); // 왼쪽 아래가 (0, 0)이 되도록 위아래를 뒤집어 줍니다.
 
 		cv::imshow("HongLab Algorithms Part2", image);
+		// cv::aitKey(0);
 
 		if (cv::waitKey(1) == 27) return true; // Press ESC key to out
-		if (cv::getWindowProperty("HongLab Algorithms Part2", cv::WND_PROP_VISIBLE) <= 0) return true;
+			
+		if (cv::getWindowProperty("HongLab Algorithms Part2", cv::WND_PROP_VISIBLE) == 0) return true;
 
 		return false;
 	}

@@ -48,6 +48,7 @@ bool Intersection(Point o1, Point p1, Point o2, Point p2, Point& r)
 	Point d2 = p2 - o2;
 
 	int cross = d1.x * d2.y - d1.y * d2.x;
+
 	if (cross == 0)
 		return false;
 

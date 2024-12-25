@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	while (true)
 	{
 		hlab::preframe(); // 그리기 준비 작업
-		std::cout << "After hlab::preframe()" << std::endl;
+		// std::cout << "After hlab::preframe()" << std::endl;
 
 		for (Point p : points)
 		{
@@ -63,17 +63,17 @@ int main(int argc, char** argv)
 
 			cv::circle(image, p, 15, color, -1, LINE_AA);
 		}
-		std::cout << "After for loop" << std::endl;
+		// std::cout << "After for loop" << std::endl;
 		// 마우스로 클릭한 물체 가장자리 그리기
 		if (selected)
 			cv::circle(image, *selected, 17, cv::Scalar(0, 255, 0), 1, LINE_AA);
 
 		// 화살표 그리기
 		DrawArrow(image, line_start, line_end, cv::Scalar(30, 30, 30));
-		std::cout << "After DrawArrow()" << std::endl;
+		// std::cout << "After DrawArrow()" << std::endl;
 
 		if (hlab::postframe()) break; // 그린 후에 마무리 작업, ESC 누르면 종료
-		std::cout << "After hlab::postframe()" << std::endl;
+		// std::cout << "After hlab::postframe()" << std::endl;
 	}
 
 	return 0;

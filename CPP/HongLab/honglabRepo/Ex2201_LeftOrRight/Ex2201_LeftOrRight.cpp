@@ -19,6 +19,7 @@ int Direction(Point p0, Point p1, Point p2)
 	// return true; // TODO: 벡터곱(vector product, cross product) 사용
 	// TODO: 왜 cross product를 하면 알 수 있는가? 원인은 무엇인가?
 	// cross product의 특징과 발견배경 사용 사례 조사
+
 	return (((x1 - x0) * (y2 - y0)) - ((x2 - x0) * (y1 - y0)));
 }
 
