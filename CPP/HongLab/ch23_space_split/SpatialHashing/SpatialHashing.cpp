@@ -41,7 +41,9 @@ int main(int argc, char** argv)
 	// TODO: hashmap을 사용하도록 수정
 	// HAsh map에서도 반지름으로 나누는 이유?
 	for (auto& p : points)
-		hashmap[Hash(p.x / radius, p.y / radius, int(hashmap.size()))].push_back(&p);
+		// hashmap[Hash(p.x, p.y, int(hashmap.size()))] = &p
+		size_t pos = Hash(p.x / radius, p.y / radius, int(hashmap.size()));
+		hashmap[pos].push_back(&p);
 
 	while (true)
 	{
@@ -75,8 +77,8 @@ int main(int argc, char** argv)
 		{
 			for (int r = max(0, int(reference.y / radius) - 1); r <= min(image.rows - 1, int(reference.y / radius) + 1); r++)
 			{
-				// for (Point* p : uniform_grid[c][r]) // TODO: uniform_grid 대신에 hashmap을 사용하도록 수정
-				for (Point* p : hashmap[Hash(c, r, int(hashmap.size()))])
+				// for (Point* p : hashmap[Hash(c, r, int(hashmap.size()))])
+				for (Point* p : uniform_grid[c][r]) // TODO: uniform_grid 대신에 hashmap을 사용하도록 수정
 				{
 					// 원 안에 들어온 점들은 빨간색, 그렇지 않은 점들은 파란색
 					if (cv::norm(reference - *p) < radius)
