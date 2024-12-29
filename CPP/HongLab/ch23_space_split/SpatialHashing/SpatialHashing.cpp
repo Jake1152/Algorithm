@@ -41,14 +41,18 @@ int main(int argc, char** argv)
 	// TODO: hashmap을 사용하도록 수정
 	// HAsh map에서도 반지름으로 나누는 이유?
 	for (auto& p : points)
-		// hashmap[Hash(p.x, p.y, int(hashmap.size()))] = &p
+	{
+		// Hash(p.x, p.y, int(hashmap.size()))
+		// hashmap[] = &p
 		size_t pos = Hash(p.x / radius, p.y / radius, int(hashmap.size()));
-		hashmap[pos].push_back(&p);
+		// hashmap[pos].push_back(&p);
+	}
 
 	while (true)
 	{
 		hlab::preframe();
 
+		// TODO: 어떻게 원을 둘러싼 9개의 사각형으로 판별하는가?
 		// 원의 반경에 해당하는 셀들을 노란색으로
 		for (int c = std::max(0, int(reference.x / radius) - 1); c <= std::min(image.cols - 1, int(reference.x / radius) + 1); c++)
 		{
@@ -77,8 +81,8 @@ int main(int argc, char** argv)
 		{
 			for (int r = max(0, int(reference.y / radius) - 1); r <= min(image.rows - 1, int(reference.y / radius) + 1); r++)
 			{
-				// for (Point* p : hashmap[Hash(c, r, int(hashmap.size()))])
-				for (Point* p : uniform_grid[c][r]) // TODO: uniform_grid 대신에 hashmap을 사용하도록 수정
+				// for (Point* p : uniform_grid[c][r]) // TODO: uniform_grid 대신에 hashmap을 사용하도록 수정
+				for (Point* p : hashmap[Hash(c, r, int(hashmap.size()))])
 				{
 					// 원 안에 들어온 점들은 빨간색, 그렇지 않은 점들은 파란색
 					if (cv::norm(reference - *p) < radius)
