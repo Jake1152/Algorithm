@@ -1,17 +1,19 @@
-NAME = SegmentsIntersect
+NAME = Ex2202_SegmentsIntersect
 CXX = g++
-CXXFLAGS = -g -std=c++11#-Wall -Wextra -Werror
+
+OPENCV_CFLAGS = $(shell pkg-config --cflags opencv4)
+OPENCV_LDFLAGS = $(shell pkg-config --libs opencv4)
+
+CXXFLAGS = -g -I.. $(OPENCV_CFLAGS)
+LDFLAGS = $(OPENCV_LDFLAGS) -L/usr/lib
+
 RM = rm -f
 
-SRCS = SegmentsIntersect.cpp
-
+SRCS = Ex2202_SegmentsIntersect.cpp
 OBJS = $(SRCS:.cpp=.o)
 
-%.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c $^ -o $@
-
 $(NAME) : $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^
+	$(CXX) $(CXXFLAGS) $(OBJS) $(LDFLAGS) -o $@
 
 all : $(NAME)
 
@@ -26,3 +28,4 @@ re :
 	make all
 
 .PHONY: all clean fclean re
+
