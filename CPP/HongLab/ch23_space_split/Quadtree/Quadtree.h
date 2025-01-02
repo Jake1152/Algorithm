@@ -56,6 +56,7 @@ namespace hlab
 			// 참고: https://stackoverflow.com/questions/401847/circle-rectangle-collision-detection-intersection
 			bool Intersect(Point p, int r) // p가 중심이고 반지름인 r과 이 노드 사각형이 닿는지 아닌지 검사
 			{
+				// TODO: max를 쓰는 이유?
 				int closest_x = max(x, min(p.x, x + width));
 				int closest_y = max(y, min(p.y, y + height));
 

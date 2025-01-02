@@ -40,8 +40,14 @@ int main(int argc, char** argv)
 	//for (auto& p : points)
 	//	movable_points.push_back(&p); // 이 예제에서는 점을 움직이면 쿼드트리를 수정해야 합니다.
 
+	// TODO: 앞 2개 인자는 16이고, 뒤에는 8 * 7인 이유?
+	// 예제에 맞춘 적당한 길이라고 함
+	// 마지막 인자 5는 쪼개는 횟수를 의미함
+	// 5단계까지 내려감
+	// 절반씩 쪼개어 내려가므로 가로, 세로 해상도는 2의 제곱수를 선택하는 것이 좋다.
 	hlab::Quadtree qtree(image.cols / 16, image.rows / 16, image.cols / 8 * 7, image.rows / 8 * 7, 5);
 
+	// 쿼드트리에 점을 추가하고 있으며, 그냥 추가하는 것이 아닌 필요하면 분할을 하고 있다.
 	for (Point p : points)
 	{
 		qtree.Insert(p);
