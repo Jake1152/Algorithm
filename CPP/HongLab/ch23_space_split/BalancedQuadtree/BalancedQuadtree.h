@@ -133,6 +133,7 @@ namespace hlab
 				n->children[3] = new Node(n->x + n->width / 2, n->y + n->height / 2, n->width / 2, n->height / 2, n->level + 1);
 
 				// 이웃 노드와의 밸런스 맞춰주기
+				// 8 개 
 				vector<Point> samples =
 				{
 					{n->x - 1, n->y - 1}, {n->x + n->width, n->y + n->height}, {n->x - 1, n->y + n->height}, {n->x + n->width, n->y - 1},
@@ -140,6 +141,14 @@ namespace hlab
 				};
 
 				// TODO: 힌트: 위의 samples와 FindLeaf()를 활용
+				for (Point& s : samples)
+				{
+					Node* adj = FindLeaf(s);
+					// leat node를 찾아서 samples에 있는 값들을 넣는다. 
+					// 그런데 왜 samples는 8개의 인자로 구성되어 있는가?
+					if (adj && adj->level <= n->level)
+						Insert(adj, s, n->level, true);
+				}
 			}
 
 			if (p.y < n->y + n->height / 2)
