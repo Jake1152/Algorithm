@@ -124,45 +124,41 @@ namespace hlab
 				return false; // 영역을 벗어나기 때문에 더 진행하지 않고 조기 종료
 			}
 
-			if (n->level == max_level) // leaf node
-			{
-				n->objects.push_back(p);
-				return true;
-			}
-			else if (p.y < n->y + n->height / 2)
-			{
-				if (p.x < n->x + n->width / 2)
-				{
-					if (!n->children[0])
-						n->children[0] = new Node(n->x, n->y, n->width / 2, n->height / 2, n->level + 1);
-
-					return Insert(n->children[0], p);
-				}
-				else
-				{
-					if (!n->children[1])
-						n->children[1] = new Node(n->x + n->width / 2, n->y, n->width / 2, n->height / 2, n->level + 1);
-
-					return Insert(n->children[1], p);
-				}
-			}
-			else
-			{
-				if (p.x < n->x + n->width / 2)
-				{
-					if (!n->children[2])
-						n->children[2] = new Node(n->x, n->y + n->height / 2, n->width / 2, n->height / 2, n->level + 1);
-
-					return Insert(n->children[2], p);
-				}
-				else
-				{
-					if (!n->children[3])
-						n->children[3] = new Node(n->x + n->width / 2, n->y + n->width / 2, n->width / 2, n->height / 2, n->level + 1);
-
-					return Insert(n->children[3], p);
-				}
-			}
+            if (n->level == max_level) // leaf node
+            {
+                n->objects.push_back(p);
+                return true;
+            }
+            else if (p.y < n->y + n->height / 2)
+            {
+                if (p.x < n->x + n->width / 2)
+                {
+                    if (!n->children[0])
+                        n->children[0] = new Node(n->x, n->y, n->width / 2, n->height / 2, n->level + 1);
+                    return Insert(n->children[0], p);
+                }
+                else
+                {
+                    if (!n->children[1])
+                        n->children[1] = new Node(n->x + n->width / 2, n->y, n->width / 2, n->height / 2, n->level + 1);
+                    return Insert(n->children[1], p);
+                }
+            }
+            else
+            {
+                if (p.x < n->x + n->width / 2)
+                {
+                    if (!n->children[2])
+                        n->children[2] = new Node(n->x, n->y + n->height / 2, n->width / 2, n->height / 2, n->level + 1);
+                    return Insert(n->children[2], p);
+                }
+                else
+                {
+                    if (!n->children[3])
+                        n->children[3] = new Node(n->x + n->width / 2, n->y + n->height / 2, n->width / 2, n->height / 2, n->level + 1);
+                    return Insert(n->children[3], p);
+                }
+            }
 		}
 
 		vector<Node*> FindLeaves(Point p, int radius)
