@@ -134,33 +134,31 @@ namespace hlab
 				if (p.x < n->x + n->width / 2)
 				{
 					if (!n->children[0])
-						n->children[0] = new Node(n->x, n->y, width / 2, height / 2, n->level + 1);
+						n->children[0] = new Node(n->x, n->y, n->width / 2, n->height / 2, n->level + 1);
 
 					return Insert(n->children[0], p);
 				}
 				else
 				{
 					if (!n->children[1])
-						n->children[1] = new Node(n->x + n->width / 2, y, width / 2, height / 2, n->level + 1);
+						n->children[1] = new Node(n->x + n->width / 2, n->y, n->width / 2, n->height / 2, n->level + 1);
 
 					return Insert(n->children[1], p);
 				}
 			}
 			else
 			{
-				return false; // TODO: 삭제
-
 				if (p.x < n->x + n->width / 2)
 				{
 					if (!n->children[2])
-						n->children[2] = new Node(n->x, n->y + n->height, width / 2, height / 2, n->level + 1);
+						n->children[2] = new Node(n->x, n->y + n->height / 2, n->width / 2, n->height / 2, n->level + 1);
 
 					return Insert(n->children[2], p);
 				}
 				else
 				{
 					if (!n->children[3])
-						n->children[3] = new Node(n->x + n->width / 2, n->y + n->width, width / 2, height / 2, n->level + 1);
+						n->children[3] = new Node(n->x + n->width / 2, n->y + n->width / 2, n->width / 2, n->height / 2, n->level + 1);
 
 					return Insert(n->children[3], p);
 				}
