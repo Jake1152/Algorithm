@@ -136,6 +136,8 @@ namespace hlab
 				// 8 개 
 				vector<Point> samples =
 				{
+					// 2 * 2
+					// 상하좌우 4방향 + 대각 4방향
 					{n->x - 1, n->y - 1}, {n->x + n->width, n->y + n->height}, {n->x - 1, n->y + n->height}, {n->x + n->width, n->y - 1},
 					{n->x - 1, n->y}, {n->x, n->y - 1},{n->x + n->width, n->y}, {n->x, n->y + n->height}
 				};
@@ -146,8 +148,12 @@ namespace hlab
 					Node* adj = FindLeaf(s);
 					// leat node를 찾아서 samples에 있는 값들을 넣는다. 
 					// 그런데 왜 samples는 8개의 인자로 구성되어 있는가?
-					if (adj && adj->level <= n->level)
+					// level의 diff가 1 이상이면 되게 처리
+					// if (adj && adj->level <= n->level)
+					if (adj && adj->level < n->level)
+					{
 						Insert(adj, s, n->level, true);
+					}
 				}
 			}
 

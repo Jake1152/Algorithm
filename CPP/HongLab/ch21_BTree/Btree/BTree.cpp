@@ -60,11 +60,9 @@ public:
 
 	void RemoveChildren(Node*& x)
 	{
-		if (x == nullptr) return;
-		// for (int i = 0; i < TODO: 몇 개를 삭제해야 할까요? ; i++)
-		// n + 1개인 이유?
-		for (int i = 0; i < x->n + 1; i++)
-			RemoveChildren(x->children[i]);
+		if (!x) return;
+		//for (int i = 0; i < TODO: 몇 개를 삭제해야 할까요? ; i++)
+		//	RemoveChildren(x->children[i]);
 
 		//cout << "Remove: ";
 		//for (int i = 0; i < x->n; i++)
@@ -164,7 +162,7 @@ public:
 	void SplitChild(Node* x, int i)
 	{
 		Node* y = x->children[i];
-		Node* z = new Node(this->_minimum_degree, y->leaf);
+		Node* z = new Node(_minimum_degree, y->leaf);
 
 		// 현재 키 개수 설정 t - 1개로 맞추는 작업
 		z->n = this->_minimum_degree - 1;
@@ -189,8 +187,6 @@ public:
 		for (int j = x->n; j >= i + 1; j -= 1)
 			x->children[j + 1] = x->children[j];
 
-			// i + 1
-		// key, children 
 		x->children[i + 1] = z; // 빈 자리에 z를 새로운 자식으로 추가
 
 		// y의 중간 키를 x로 이동하기 위해 빈 자리 마련
@@ -227,7 +223,6 @@ public:
 	// keys에서 k보다 큰 첫 인덱스
 	int FindKey(Node* x, T_KEY k)
 	{
-		// int idx = -1;
 		int idx = 0;
 		while (idx < x->n && x->keys[idx] < k)
 			idx += 1;
@@ -239,25 +234,23 @@ public:
 	void Fill(Node* x, int idx)
 	{
 		// x->children[idx-1]에 여유가 있다면 거기서 가져옵니다. Case 3a
-		// if (idx != 0 && TODO: 조건)
-		if (idx != 0 && x->children[idx - 1]->n >= this->_minimum_degree)
-			BorrowFromPrev(x, idx);
+		//if (idx != 0 && TODO: 조건)
+		//	BorrowFromPrev(x, idx);
 
-		// x->children[idx+1]에 여유가 있다면 거기서 가져옵니다. Case 3a
-		// else if (idx != x->n && TODO: 조건)
-		else if (idx != x->n && x->children[idx + 1]->n >= this->_minimum_degree)
-			BorrowFromNext(x, idx);
+		//// x->children[idx+1]에 여유가 있다면 거기서 가져옵니다. Case 3a
+		//else if (idx != x->n && TODO: 조건)
+		//	BorrowFromNext(x, idx);
 
 		//// 그 외의 경우에는 형제 노드와 합칩니다. Case 3b
 		//// 위에서 형제들 x->children[idx - 1], x->children[idx + 1]이 크지 않다는 것을 확인했기 때문에 
 		//// 합쳐도 최대 조건을 넘지 않습니다.
-		else
-		{
-			if (idx != x->n)
-				Merge(x, idx);     // children[idx]와 children[idx+1]을 합칩니다.
-			else
-				Merge(x, idx - 1); // children[idx]가 마지막 자식일 경우에는 그 앞의 자식인 children[idx - 1]과 합칩니다.
-		}
+		//else
+		//{
+		//	if (idx != x->n)
+		//		Merge(x, idx);     // children[idx]와 children[idx+1]을 합칩니다.
+		//	else
+		//		Merge(x, idx - 1); // children[idx]가 마지막 자식일 경우에는 그 앞의 자식인 children[idx - 1]과 합칩니다.
+		//}
 
 		return;
 	}
@@ -266,53 +259,43 @@ public:
 	{
 		int idx = FindKey(x, k);
 
-		// if (idx < x->n && TODO: 조건) // x에 k가 저장되어 있는 경우
-		// if (idx < x->n && x->children[idx]) // x에 k가 저장되어 있는 경우
-		if (idx < x->n && x->keys[idx] == k) // x에 k가 저장되어 있는 경우
+		// if (idx < x->n && x->children[k]) // x에 k가 저장되어 있는 경우
+		// x->keys[idx] == k
+		if (idx < x->n && x->children[k])
 		{
 			if (x->leaf)
 				DeleteFromLeaf(x, idx);      // 리프노드에서 삭제, Case 1
 			else
 				DeleteFromNonLeaf(x, idx);   // 리프가 아닌 노드에서 삭제, Case 2
 		}
-		else
-		{
-			if (x->leaf) // x가 리프인데 k가 없다면 트리에 없다는 의미 (삭제 불가)
-			{
-				cout << "The key " << k << " is does not exist in the tree\n";
-				return;
-			}
+		//else
+		//{
+		//	if (x->leaf) // x가 리프인데 k가 없다면 트리에 없다는 의미 (삭제 불가)
+		//	{
+		//		cout << "The key " << k << " is does not exist in the tree\n";
+		//		return;
+		//	}
 
-			// 그렇지 않다면 자식 노드에 찾아가서 삭제
+		//	// 그렇지 않다면 자식 노드에 찾아가서 삭제
 
-			// flag는 찾아가야 하는 자식 노드가 마지막 자식 노드인지를 기록
-			bool flag = ((idx == x->n) ? true : false);
+		//	// flag는 찾아가야 하는 자식 노드가 마지막 자식 노드인지를 기록
+		//	bool flag = ((idx == x->n) ? true : false);
 
-			// 삭제 후에 최소 조건을 만족시키지 못할 상황이라면 여분 하나를 미리 증가시켜 준다.
-			// if (TODO: 조건)
-			// if (x->n < this->_minimum_degree - 1)
-			/** 자식 노드의 키의 개수를 확인한다. */
-			// if (x->children[idx]->n <= this->_minimum_degree - 1)
-			if (x->children[idx]->n == this->_minimum_degree - 1)
-				Fill(x, idx);
+		//	// 삭제 후에 최소 조건을 만족시키지 못할 상황이라면 여분 하나를 미리 증가시켜 준다.
+		//	if (TODO: 조건)
+		//		Fill(x, idx);
 
-			// Fill()에서 마지막 자식은 그 앞의 자식과 합치는 방식
-			// 그런 경우에는 마지막 자식이 사라졌기 때문에 idx -1 자식으로 재귀호출
-			if (flag && idx > x->n)
-				Delete(x->children[idx - 1], k);
-			else
-				Delete(x->children[idx], k);
-		}
+		//	// Fill()에서 마지막 자식은 그 앞의 자식과 합치는 방식
+		//	// 그런 경우에는 마지막 자식이 사라졌기 때문에 idx -1 자식으로 재귀호출
+		//	if (flag && idx > x->n)
+		//		Delete(x->children[idx - 1], k);
+		//	else
+		//		Delete(x->children[idx], k);
+		//}
 
 		return;
 	}
 
-	/**
-	 * 실제로 지우지는 않음 
-	 * 처음에 키 최대 개수만큼 동적 할당 해두었기에
-	 * 쓰지 않게 되는 부분들도 바로바로 해제하지 않는 것으로 보임
-	 * 단지 가지고 있는 키의 개수를 감소시키는 것으로 삭제한 것으로 치는 방식
-	 */
 	void DeleteFromLeaf(Node* x, int idx) // 리프노드에서 삭제, Case 1
 	{
 		// idx보다 큰 것들을 하나씩 쉬프트 시켜서 idx 위치가 삭제된 효과 구현
@@ -343,13 +326,9 @@ public:
 		// 자식 서브트리로 책임을 미루는 느낌입니다. Case 2b
 		else if (x->children[idx + 1]->n >= this->_minimum_degree)
 		{
-			// T_KEY pred = GetPred(x, idx + 1);   // 바꿔치기할 값을 가져옵니다.
-			// x->keys[idx + 1] = pred;            // 삭제할 키 자리에 덮어쓰고
-			// Delete(x->children[idx + 1], pred); // 내려가면서 그 값을 삭제하도록 합니다.
-			// TODO:
-			T_KEY succ = GetSucc(x, idx);   // 바꿔치기할 값을 가져옵니다.
-			x->keys[idx] = succ;            // 삭제할 키 자리에 덮어쓰고
-			Delete(x->children[idx + 1], succ); // 내려가면서 그 값을 삭제하도록 합니다.
+			//TODO;        // 바꿔치기할 값을 가져옵니다.
+			//TODO;        // 삭제할 키 자리에 덮어쓰고
+			//TODO;        // 내려가면서 그 값을 삭제하도록 합니다.
 		}
 
 		// 삭제할 k보다 작은 자식 노드와 큰 자식 노드 두 개를 합칩니다.
@@ -380,26 +359,16 @@ public:
 	T_KEY GetPred(Node* x, int idx)
 	{
 		Node* cur = x->children[idx];
-		while (cur->leaf == false)
-			cur = cur->children[cur->n - 1];
-			// cur = cur->children[cur->n];
-		// TOKNOW: 왜 key 중에서는 n - 1인데 children 중에서는 n인가?
+		while (!cur->leaf)
+			cur = cur->children[cur->n];
 		return cur->keys[cur->n - 1];
 	}
 
 	// 현재 삽입하려는 키보다 큰 키들 중에서 가장 작은 것을 찾습니다.
 	T_KEY GetSucc(Node* x, int idx)
 	{
-		// 왜 cur = x->children[idx + 1]; 인가?
 		Node* cur = x->children[idx + 1];
-		/**
-		 * 왜 cur->children[0];으로 하는가?
-		 * 자식들 중에서는 정렬 되어 있으니까
-		 * 가장 왼쪽 자식이 가장 작고
-		 * 그 자식의 가장 왼쪽이 역시 가장 작으므로
-		 * 단말 노드가 될때까지 반복하면 가장 작은 노드를 얻을 수 있게 된다.
-		 */
-		while (cur->leaf == false)
+		while (!cur->leaf)
 			cur = cur->children[0];
 		return cur->keys[0];
 	}
