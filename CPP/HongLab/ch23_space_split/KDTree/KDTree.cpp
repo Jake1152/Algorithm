@@ -43,22 +43,32 @@ public:
 
 		if (!n)
 		{
+			// m은 중간지점, meadian
 			auto m = v.begin() + v.size() / 2;
-
+			// k select
+			// [&](){}의 의미 람다?
+			// 람다와 익명함수의 공통점과 차이점
 			std::nth_element(v.begin(), m, v.end(), [&](const vector<int>& a, const vector<int>& b) {return a[d] < b[d]; });
-
+			
+			// 중간지점을 찾아서 가로, 세로 나누므로 같은 것인가?
 			vector<int> x = v[v.size() / 2];
 
+			// node의 용도 점, left, right 존재
 			n = new Node{ x };
 			n->minpos = minpos;
 			n->maxpos = maxpos;
 			n->d = d;
 
+			// m은 무엇인가? 중간 값을 의미
 			vector<vector<int>> v_left(v.begin(), m); // m is not included
 			vector<vector<int>> v_right(m + 1, v.end());
 
-			vector<int> left_minpos = minpos, left_maxpos = maxpos;
-			vector<int> right_minpos = minpos, right_maxpos = maxpos;
+			// 각 구역의 왼쪽 오른쪽 경계?
+			// 왜 left minpos, maxpos 둘 다 있는가?
+			vector<int> left_minpos = minpos;
+			vector<int> left_maxpos = maxpos;
+			vector<int> right_minpos = minpos;
+			vector<int> right_maxpos = maxpos;
 			left_maxpos[d] = n->data[d];
 			right_minpos[d] = n->data[d];
 
