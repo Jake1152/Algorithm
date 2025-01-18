@@ -181,8 +181,10 @@ public:
 			if (n->left)
 				FindNearest(n->left, x, nearest, dist, visited);
 
+			// 기준점으로부터 현재의 가장 가까운 점과의 거리(dist)보다 더 가까운 점이 다른 kd트리 영역에 있는 경우를 찾아야함
+			// 기준점으로부터 현재의 분할선까지의 거리가 dist보다 짧다면 다른 KDtree Node에 더 가까운 점이 있을 수 있다.
 			// 경계선을 건너서 더 가까운 것이 존재할 가능성이 있을 때는 반대편(n->right)도 탐색
-			if (n->right) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
+			if (n->right && std::abs(x[n->d] - n->data[n->d]) < dist) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
 				FindNearest(n->right, x, nearest, dist, visited);
 		}
 		else
@@ -191,7 +193,7 @@ public:
 				FindNearest(n->right, x, nearest, dist, visited);
 
 			// 경계선을 건너서 더 가까운 것이 존재할 가능성이 있을 때는 반대편(n->left)도 탐색
-			if (n->left) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
+			if (n->left && std::abs(x[n->d] - n->data[n->d]) < dist) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
 				FindNearest(n->left, x, nearest, dist, visited);
 		}
 	}
