@@ -273,8 +273,11 @@ int main()
 		auto* leaf = t.FindLeaf({ reference.x, reference.y });
 
 		vector<KdTree::Node*> nearest_visited;
+		// 가장 가까운 점을 기록한다.
 		vector<int> nearest = t.FindNearest({ reference.x, reference.y }, nearest_visited);
 
+
+		// 정말 가까운 점을 찾은 게 맞는지 확인한다.
 		double dist = 1000000;
 		vector<int> temp;
 		for (auto p : points)
@@ -322,9 +325,10 @@ int main()
 		{
 			auto* n = visited[i];
 
-			if (n->d == 0)
+			// 공간 분할하는 선들을 그려줌
+			if (n->d == 0) // 세로선 (좌우로 분할)
 				cv::line(image, Point(n->data[0], n->minpos[1]), Point(n->data[0], n->maxpos[1]), Scalar(200, 200, 200), 1, LINE_AA);
-			else
+			else	// 가로선 (상하로 분할)
 				cv::line(image, Point(n->minpos[0], n->data[1]), Point(n->maxpos[0], n->data[1]), Scalar(200, 200, 200), 1, LINE_AA);
 
 			// cv::putText(image, to_string(i), { n->data[0], n->data[1] }, cv::FONT_HERSHEY_SIMPLEX, 1, Scalar(30, 30, 30), 1, LINE_AA, true);
