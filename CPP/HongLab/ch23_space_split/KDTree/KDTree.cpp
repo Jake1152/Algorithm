@@ -191,8 +191,10 @@ public:
 			if (n->left)
 				FindNearest(n->left, x, nearest, dist, visited);
 
+			// 기준점으로부터 현재의 가장 가까운 점과의 거리(dist)보다 더 가까운 점이 다른 kd트리 영역에 있는 경우를 찾아야함
+			// 기준점으로부터 현재의 분할선까지의 거리가 dist보다 짧다면 다른 KDtree Node에 더 가까운 점이 있을 수 있다.
 			// 경계선을 건너서 더 가까운 것이 존재할 가능성이 있을 때는 반대편(n->right)도 탐색
-			if (n->right) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
+			if (n->right && std::abs(x[n->d] - n->data[n->d]) < dist) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
 				FindNearest(n->right, x, nearest, dist, visited);
 		}
 		else
@@ -201,7 +203,7 @@ public:
 				FindNearest(n->right, x, nearest, dist, visited);
 
 			// 경계선을 건너서 더 가까운 것이 존재할 가능성이 있을 때는 반대편(n->left)도 탐색
-			if (n->left) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
+			if (n->left && std::abs(x[n->d] - n->data[n->d]) < dist) // TODO: 현재는 모든 노드를 찾는 방식, 조건을 추가해서 탐색 범위 줄이기
 				FindNearest(n->left, x, nearest, dist, visited);
 		}
 	}
@@ -283,8 +285,11 @@ int main()
 		auto* leaf = t.FindLeaf({ reference.x, reference.y });
 
 		vector<KdTree::Node*> nearest_visited;
+		// 가장 가까운 점을 기록한다.
 		vector<int> nearest = t.FindNearest({ reference.x, reference.y }, nearest_visited);
 
+
+		// 정말 가까운 점을 찾은 게 맞는지 확인한다.
 		double dist = 1000000;
 		vector<int> temp;
 		for (auto p : points)
@@ -332,9 +337,10 @@ int main()
 		{
 			auto* n = visited[i];
 
-			if (n->d == 0)
+			// 공간 분할하는 선들을 그려줌
+			if (n->d == 0) // 세로선 (좌우로 분할)
 				cv::line(image, Point(n->data[0], n->minpos[1]), Point(n->data[0], n->maxpos[1]), Scalar(200, 200, 200), 1, LINE_AA);
-			else
+			else	// 가로선 (상하로 분할)
 				cv::line(image, Point(n->minpos[0], n->data[1]), Point(n->maxpos[0], n->data[1]), Scalar(200, 200, 200), 1, LINE_AA);
 
 			// cv::putText(image, to_string(i), { n->data[0], n->data[1] }, cv::FONT_HERSHEY_SIMPLEX, 1, Scalar(30, 30, 30), 1, LINE_AA, true);
