@@ -184,7 +184,8 @@ int main(int argc, char** argv)
 	Rectangle obstacle1{ 300, 500, 600, 100 };
 	Rectangle obstacle2{ 800, 300, 100, 400 };
 
-	int s = 32;
+	// int s = 32;
+	int s = 16;
 
 	for (int j = 0; j < image.rows; j += s)
 		for (int i = 0; i < image.cols; i += s)

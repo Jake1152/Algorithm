@@ -203,10 +203,17 @@ int main(int argc, char** argv)
 
 	EdgeWeightedDigraph g(int(points.size()));
 
+	// 각각의 정점에 대해서 휴리스틱을 저장할 수 있는 배열을 만든다.
 	vector<double> heur(points.size());
 
 	for (int i = 0; i < points.size(); i++)
 	{
+		
+		// 각각의 정점에 대해서 목적지와의 거리를 계산한다.
+		// 우선순위큐는 누적된 가중치가 가까운 정점을 먼저 방문하게 되어있다.
+		// 바꾸어서 목적지가 더 가까운 정점을 방문하도록 수정한다.
+		// 각각의 정점이 목적지로부터 얼마나 멀리있는지를 미리 저장해두어야한다.
+
 		// Euclidean distance가 의외로 잘 안됩니다.
 		// heur[i] = cv::norm(points[i] - points.back());
 
