@@ -1,420 +1,140 @@
 #include "../shared/draw_helper.h"
-
-#include <string>
+#include "BalancedQuadtree.h"
+#include "PathFinding.h"
 
 using namespace std;
 using namespace cv;
 using namespace hlab;
 
-struct LineSegment
-{
-	Point p1, p2;
-	string name; // 디버깅/가시화 용도
+#include <iostream>
+#include <list>
+#include <vector>
+#include <limits>
 
-	//void Print() // 디버깅용
+using namespace std;
+using namespace hlab;
+
+struct Rectangle
+{
+	int x, y, width, height;
+
+	bool IsInside(Point p)
+	{
+		if (p.x < x) return false;
+		if (p.x >= x + width) return false;
+		if (p.y < y) return false;
+		if (p.y >= y + height) return false;
+		return true;
+	}
+};
+
+void DisplayQuadtree(Mat& image, BalancedQuadtree::Node* n)
+{
+	if (!n) return;
+
+	bool has_child = false;
+	for (auto* c : n->children)
+		if (c)
+			has_child = true;
+
+	//if (has_child)
 	//{
-	//	cout << "{ {" << p1.x << ", " << p1.y << "}, {" << p2.x << ", " << p2.y << "}, \"" << name << "\" })" << endl;
+	//	cv::line(image, { n->x, n->y + n->height / 2 }, { n->x + n->width, n->y + n->height / 2 }, Scalar(217, 217, 214), 1, LINE_AA);
+	//	cv::line(image, { n->x + n->width / 2, n->y }, { n->x + n->width / 2 , n->y + n->height }, Scalar(217, 217, 214), 1, LINE_AA);
 	//}
-};
 
-// 양수면 왼쪽, 음수면 오른쪽, 0이면 직선 위에
-int Direction(Point p0, Point p2, Point p1)
-{
-	return (p1.x - p0.x) * (p2.y - p0.y) - (p2.x - p0.x) * (p1.y - p0.y);
-}
-
-bool OnSegment(Point pi, Point pj, Point pk)
-{
-	if (min(pi.x, pj.x) <= pk.x && pk.x <= max(pi.x, pj.x) && min(pi.y, pj.y) <= pk.y && max(pi.y, pj.y)) return true;
-	else return false;
-}
-
-// p1-p2는 선분이 아니라 직선(길이 무한)
-// 직선과 선분이 교차하는지 본다.
-bool LineAndSegmentIntersect(Point p1, Point p2, Point p3, Point p4)
-{
-	int d1 = Direction(p3, p4, p1);
-	int d2 = Direction(p3, p4, p2);
-	int d3 = Direction(p1, p2, p3);
-	int d4 = Direction(p1, p2, p4);
-
-	if ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0)) return true;
-
-	return false;
-}
-
-// 선분끼리 교차하는지 확인
-bool SegmentsIntersect(Point p1, Point p2, Point p3, Point p4)
-{
-	int d1 = Direction(p3, p4, p1);
-	int d2 = Direction(p3, p4, p2);
-	int d3 = Direction(p1, p2, p3);
-	int d4 = Direction(p1, p2, p4);
-
-	// 서로 교차하는지 확인
-	if (((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0))) return true;
-	//if ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0)) return true; // Line-Segment Interect
-	else if (d1 == 0 && OnSegment(p3, p4, p1)) return true;
-	else if (d2 == 0 && OnSegment(p3, p4, p2)) return true;
-	else if (d3 == 0 && OnSegment(p1, p2, p3)) return true;
-	else if (d4 == 0 && OnSegment(p1, p2, p4)) return true;
-	else return false;
-}
-
-// https://stackoverflow.com/questions/7446126/opencv-2d-line-intersection-helper-function
-bool Intersection(Point o1, Point p1, Point o2, Point p2, Point& r)
-{
-	Point x = o2 - o1;
-	Point d1 = p1 - o1;
-	Point d2 = p2 - o2;
-
-	double cross = d1.x * d2.y - d1.y * d2.x;
-	if (abs(cross) < /*EPS*/1e-8)
-		return false;
-
-	double t1 = (x.x * d2.y - x.y * d2.x) / cross;
-	r = o1 + d1 * t1;
-	return true;
-}
-
-class BSPTree
-{
-public:
-	struct Node
-	{
-		// KDTree는 선을 가지고 어떤 축으로 쪼갤지를 정했었다.
-		// BSPTree에서는 직선을 가지고 쪼갠다.
-		LineSegment l;
-
-		Node* left = nullptr;
-		Node* right = nullptr;
-	};
-
-	void Insert(LineSegment l)
-	{
-		if (!root)
+	for (auto* c : n->children)
+		if (c)
 		{
-			root = new Node{ l };
-			cout << "Root " << l.name << endl;
-		}
-		else
-		{
-			Insert(root, l);
-		}
-	}
-
-	void Insert(Node* node, LineSegment l)
-	{
-		// cross product를 이용해서 왼쪽이면 왼쪽으로 오른쪽이면 오른쪽으로
-		// 걸쳐 있다면 잘라서 넣는다.
-
-		int d1 = Direction(node->l.p1, node->l.p2, l.p1);
-		int d2 = Direction(node->l.p1, node->l.p2, l.p2);
-
-		// p1-p2 직선과 완전히 겹치는 선분은 입력으로 들어오지 않는다고 가정
-		// if(d1 == 0 && d2 == 0) { 발생하지 않는다고 가정 } 
-
-		// 1. 전부 왼쪽일 경우
-		if (d1 >= 0 && d2 >= 0)
-		{
-			if (node->left == nullptr)
-				Insert(node->left, l);
-			else
-				node->left = new Node{ l };
+			DisplayQuadtree(image, c);
 		}
 
-		// 2. 전부 오른쪽일 경우
-		else if (d1 <= 0 && d2 <= 0)
-		{
-			if (node->right == nullptr)
-				Insert(node->right, l);
-			else
-				node->right = new Node{ l };
-		}
-		// 3. 걸쳐있을 때는 잘라서 (p1은 왼쪽)
-		else if (d1 >= 0 && d2 <= 0) // p1은 왼쪽, p2는 오른쪽
-		{
-			Point r;
-			Intersection(node->l.p1, node->l.p2, l.p1, l.p2, r);
+	cv::rectangle(image, Rect(n->x, n->y, n->width + 1, n->height + 1), Scalar(0, 102, 255), 1, LINE_4); // width/height + 1 주의
 
-			if (!node->left)
-				node->left = new Node{ {l.p1, r, l.name + "1"} };
-			else
-				Insert(node->left, { l.p1, r, l.name + "1" });
+	//if (!has_child) // leaf node
+	//	for (auto* adj : n->neighbors) // 이웃 노드들과의 연결선
+	//		cv::line(image, { n->Center().x, n->Center().y }, { adj->Center().x, adj->Center().y }, Scalar(217, 217, 214), 1, LINE_4);
 
-			if (!node->right)
-				node->right = new Node{ {r, l.p2 , l.name + "2"} };
-			else
-				Insert(node->right, { r, l.p2 , l.name + "2" });
-		}
-		// 4. 걸쳐있을 때 잘라서 (p1은 오른쪽)
-		else if (d1 <= 0 && d2 >= 0) // p1은 오른쪽, p2는 왼쪽
-		{
-			Point r;
-			Intersection(node->l.p1, node->l.p2, l.p1, l.p2, r);
-
-			if (!node->right)
-				node->right = new Node{ {l.p1, r, l.name + "1" } };
-			else
-				Insert(node->right, { l.p1, r, l.name + "1" });
-
-			if (!node->left)
-				node->left = new Node{ {r, l.p2, l.name + "2"} };
-			else
-				Insert(node->left, { r, l.p2, l.name + "2" });
-		}
-	}
-
-	// 어떤 점에 대해서 leaf를 찾는다.
-	// 점이 속해 있는 영역이 어디인가를 의미함.
-	vector<LineSegment> FindLeaf(Point p)
-	{
-		vector<LineSegment> visited;
-
-		FindLeaf(root, p, visited);
-
-		return visited;
-	}
-
-	// 마치 이진트리인 것처럼 구현이 되어 있다.
-	// 점이 왼쪽이면 왼쪽으로 이동,  그렇지 않으면 오른쪽으로 이동
-	void FindLeaf(Node* n, Point p, vector<LineSegment>& visited)
-	{
-		if (!n) return;
-
-		visited.push_back(n->l);
-
-		int dir = Direction(n->l.p1, n->l.p2, p);
-
-		if (dir >= 0) // 0인 경우는 왼쪽으로
-			FindLeaf(n->left, p, visited);
-		else
-			FindLeaf(n->right, p, visited);
-	}
-
-	vector<LineSegment> Traverse(Point p)
-	{
-		vector<LineSegment> visited;
-
-		Traverse(root, p, visited);
-
-		return visited;
-	}
-
-	void Traverse(Node* n, Point p, vector<LineSegment>& visited)
-	{
-		if (!n) return;
-
-		// cout << n->l.name << " ";
-
-		if (Direction(n->l.p1, n->l.p2, p) >= 0)// 0인 경우는 왼쪽으로 (결국 모두 방문하기 때문에 충돌 체크 결과는 동일)
-		{
-			//cout << "Left of " << n->l.name << endl;
-
-			Traverse(n->right, p, visited); // right먼저 방문
-			visited.push_back(n->l);        // Inorder traversal
-			Traverse(n->left, p, visited);
-		}
-		else
-		{
-			Traverse(n->left, p, visited); // left먼저 방문
-			visited.push_back(n->l);
-			Traverse(n->right, p, visited);
-		}
-	}
-
-	// 가장 먼저 충돌하는 지점을 찾는다.
-	bool Collision(LineSegment ray, Point& result) // 0보다 작은 값을 반환하면 충돌 없음
-	{
-		return Collision(root, ray, result);
-	}
-
-	bool Collision(Node* n, LineSegment ray, Point& result)
-	{
-		if (!n) return false;
-
-		int d1 = Direction(n->l.p1, n->l.p2, ray.p1);
-		int d2 = Direction(n->l.p1, n->l.p2, ray.p2);
-
-		if (d1 >= 0 && d2 >= 0) {
-			return Collision(n->left, ray, result);
-		}
-		else if (d1 <= 0 && d2 <= 0) {
-			return Collision(n->right, ray, result);
-		}
-		else if (d1 >= 0 && d2 <= 0) // 교차할 경우 (p1은 왼쪽, p2는 오른쪽), d1과 d2가 둘 다 0인 경우는 없다고 가정
-		{
-			// 가장 가까운 교차점을 찾는 것이 문제 (불필요한 비교를 피해야 함)
-
-			Point r;
-			bool check = Intersection(n->l.p1, n->l.p2, ray.p1, ray.p2, r); // 직선-선분 교차
-
-			if (Collision(n->left, { ray.p1, r }, result))
-			{
-				return true; // 더 가까운 곳에서 충돌이 발생했기 때문에 더 할일이 없음
-			}
-			else
-			{
-				if (SegmentsIntersect(n->l.p1, n->l.p2, ray.p1, ray.p2)) // 선분-선분 교차일 경우 
-				{
-					result = r;
-					return true;
-				}
-				else
-				{
-					return Collision(n->right, { r, ray.p2 }, result);
-				}
-			}
-		}
-		else // if(d1 <= 0 && d2 >= 0) // 교차할 경우 (p1은 오른쪽, p2는 왼쪽), d1과 d2가 둘 다 0인 경우는 없다고 가정
-		{
-			Point r;
-			bool check = Intersection(n->l.p1, n->l.p2, ray.p1, ray.p2, r);
-
-			if (Collision(n->right, { ray.p1, r }, result))
-			{
-				return true; // 더 가까운 곳에서 충돌이 발생했기 때문에 더 할일이 없음
-			}
-			else
-			{
-				if (SegmentsIntersect(n->l.p1, n->l.p2, ray.p1, ray.p2)) // 선분-선분 교차
-				{
-					result = r;
-					return true;
-				}
-				else
-				{
-					return Collision(n->left, { r, ray.p2 }, result);
-				}
-			}
-		}
-	}
-
-	Node* root = nullptr;
-
-	// 디버깅 편의 도구
-
-	// 루트만 있을 경우 높이 0
-	// https://en.wikipedia.org/wiki/Tree_(data_structure)
-	int Height() { return Height(root); }
-	int Height(Node* node)
-	{
-		if (!node) return -1;
-		return 1 + std::max(Height(node->left), Height(node->right));
-	}
-
-	vector<string> screen;
-	void PrintLine(int x, string s, string& line) {
-		for (const auto c : s) line[x++] = c;
-	}
-	void Print2D() { Print2D(root); }
-	void Print2D(Node* root) {
-		if (!root) cout << "Empty" << endl;
-		else {
-			int h = Height(root) + 1, w = 4 * int(pow(2, h - 1));
-			screen.clear();
-			screen.resize(h * 2, string(w, ' '));
-			Print2D(root, w / 2 - 2, 0, h - 1);
-			for (const auto& l : screen) cout << l << endl;
-		}
-	}
-	void Print2D(Node* n, int x, int level, int s)
-	{
-		PrintLine(x, " " + n->l.name, screen[2 * level]);
-		x -= int(pow(2, s));
-		if (n->left) {
-			PrintLine(x, "  /", screen[2 * level + 1]);
-			Print2D(n->left, x, level + 1, s - 1);
-		}
-		if (n->right)
-		{
-			PrintLine(x + 2 * int(pow(2, s)), "\\", screen[2 * level + 1]);
-			Print2D(n->right, x + 2 * int(pow(2, s)), level + 1, s - 1);
-		}
-	}
-};
-
-void DrawArrow(cv::Mat& image, Point line_start, Point line_end, Scalar color)
-{
-	if (selected)
-		cv::circle(image, *selected, 17, Scalar(0, 255, 0), 1, LINE_AA);
-
-	cv::Point temp = line_end - line_start;
-	//cv::line(image, line_start - temp * 1000, line_start + temp * 1000, Scalar(200, 200, 200), 1, LINE_AA);
-	cv::circle(image, line_start, 2, color, -1, LINE_AA);
-	cv::arrowedLine(image, line_start, line_end, color, 1, LINE_AA, 0, 0.02);
+	//for (auto& p : n->objects)
+	//{
+	//	cv::circle(image, { p.x, p.y }, 5, Scalar(200, 200, 200), -1, LINE_AA);
+	//}
 }
 
 int main(int argc, char** argv)
 {
 	hlab::initialize(1280, 960);
 
-	vector<LineSegment> segments;
-	segments.push_back(LineSegment{ {350, 80}, {1050, 80}, "A" });
-	segments.push_back(LineSegment{ {1050, 80}, {1050, 400}, "B" });
-	segments.push_back(LineSegment{ {1050, 400}, {630, 320}, "C" });
-	segments.push_back(LineSegment{ {630, 320}, {560, 560}, "D" });
-	segments.push_back(LineSegment{ {560, 560}, {979, 560}, "E" });
-	segments.push_back(LineSegment{ {979, 560}, {909, 800}, "F" });
-	segments.push_back(LineSegment{ {909, 800}, {420, 720}, "G" });
-	segments.push_back(LineSegment{ {420, 720}, {350, 80}, "H" });
-
-	LineSegment ray{ {700, 700}, {700, 160} };
-
-	movable_points.push_back(&ray.p1);
-	movable_points.push_back(&ray.p2);
-
-	BSPTree tree;
-
-	for (LineSegment s : segments)
-	{
-		tree.Insert(s);
+	Mat map = imread("../map1280x960.png", cv::IMREAD_COLOR); // 주의: map.png의 해상도와 화면 해상도가 같아야 합니다.
+	cv::flip(map, map, 0);
+	if (map.empty()) {
+		cout << "Failed to read map.png file." << endl;
+		return -1;
 	}
 
-	tree.Print2D();
+	Point start_prev = { -1, -1 }; // 마우스 드래그로 인한 이동 확인용
+	Point end_prev = { -1, -1 };   // 마우스 드래그로 인한 이동 확인용
+
+	Point start_point = { 0, 0 };
+	Point end_point = { map.cols - 1, map.rows - 1 };
+
+	movable_points.push_back(&start_point);
+	movable_points.push_back(&end_point);
+
+	BalancedQuadtree qtree(0, 0, image.cols, image.rows, 6); // max_level이 너무 낮으면 지형을 제대로 반영하지 못해서 뚫고 가는 경우가 발생합니다.
+	DijkstraShortestPaths d;
 
 	while (true)
 	{
+		// 처음 시작할 때, 또는 시작점과 끝점이 이동했을 경우에 쿼드 트리와 그래프 새로 만들기
+		if (!left_down && (start_prev != start_point || end_prev != end_point))
+		{
+			// TODO: 빈칸 채우기 용도라기 보다는, 
+			//       지도 이미지 읽어들이는 방법을 자연스럽게 알려드리는 용도로 제공해드리는 코드입니다.
+
+			// 지도를 읽어들여서 쿼드 트리 분할
+			// 검은색 픽셀은 갈 수 없는 곳, 흰색 픽셀은 갈 수 있는 곳을 의미
+			for (int r = 1; r < map.rows - 1; r += 1)
+				for (int c = 1; c < map.cols - 1; c += 1) // 구현 편의상 가장자리 픽셀들은 무시
+				{
+					// 주변에 검은색 픽셀과 맞닿아 있는 흰색 픽셀 위치에 점 추가
+					if (map.at<Vec3b>(r, c)[0] > 0)
+					{
+						if (map.at<Vec3b>(r + 1, c)[0] == 0 || map.at<Vec3b>(r - 1, c)[0] == 0 ||
+							map.at<Vec3b>(r, c + 1)[0] == 0 || map.at<Vec3b>(r, c - 1)[0] == 0 ||
+							map.at<Vec3b>(r + 1, c + 1)[0] == 0 || map.at<Vec3b>(r + 1, c - 1)[0] == 0 ||
+							map.at<Vec3b>(r - 1, c + 1)[0] == 0 || map.at<Vec3b>(r - 1, c - 1)[0] == 0)
+						{
+							// TODO: 흰색과 검은색이 만나는 가장자리 입니다.
+							// TODO: 흰색과 검은색이 만나는 가장자리에서는 무엇을 해야할까?
+						}
+					}
+				}
+
+			// qtree.SplitMax();   // 최대 해상도로 모두 분할 (테스트용)
+
+			// TODO: g에 edge 추가
+			// TOKNOW: g는 무엇인가>
+
+			// TODO: d.Initialize(g, start_index, end_index, heur);
+		}
+
+		//if (!hlab::left_down) // 마우스로 드래그하는 동안에는 경로 업데이트 중지
+		//	d.Update(); // 힌트
+
+		// auto path = d.GetPath(); // 힌트
+
 		hlab::preframe();
 
-		if (selected)
-		{
-			cv::circle(image, *selected, 17, Scalar(0, 255, 0), 1, LINE_AA);
+		// 지도 이미지를 화면에 그리기
+		for (int c = 0; c < image.cols; c++)
+			for (int r = 0; r < image.rows; r++)
+				if (map.at<Vec3b>(r, c)[0] == 0) // 흑백 BMP 이미지
+					image.at<Vec3b>(r, c) = Vec3b(255, 191, 0);
 
-			auto visited = tree.FindLeaf(*selected);
+		DisplayQuadtree(image, qtree.root);
 
-			for (auto& l : visited)
-			{
-				int d = Direction(l.p1, l.p2, *selected);
-
-				for (int c = 0; c < image.cols; c++)
-					for (int r = 0; r < image.rows; r++)
-					{
-						int d2 = Direction(l.p1, l.p2, Point(c, r));
-						if ((d < 0 && d2 > 0) || (d > 0 && d2 < 0))
-							image.at<Vec3b>(r, c) = Vec3b(200, 200, 200); // 밝은 회색
-
-						// visit 한 곳들을 회색으로 모두 칠했기 때문에
-						// selected를 둘러싼 지점만 흰색으로 남게 됩니다.
-					}
-			}
-		}
-
-		int count = 0;
-		auto visited = tree.Traverse(ray.p1);
-		for (LineSegment s : visited)
-		{
-			// cout << s.name << " ";
-			count += 1;
-			DrawArrow(image, s.p1, s.p2, Scalar(30, 30, 30));
-			cv::putText(image, s.name + "_" + std::to_string(count), (s.p1 + s.p2) / 2, cv::FONT_HERSHEY_SIMPLEX, 0.5, Scalar(30, 30, 30), 1, LINE_AA, true);
-		}
-
-		cv::arrowedLine(image, ray.p1, ray.p2, Scalar(255, 125, 125), 3, LINE_AA, 0, 0.05);
-
-		Point collision_point;
-		if (tree.Collision(ray, collision_point))
-			cv::circle(image, collision_point, 8, Scalar(30, 30, 255), -1, LINE_AA);
+		// TODO:
 
 		if (hlab::postframe()) break;
 	}

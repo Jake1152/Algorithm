@@ -63,6 +63,12 @@ namespace hlab
 		BalancedQuadtree(int _x, int _y, int _width, int _height, int _max_level)
 			: x(_x), y(_y), width(_width), height(_height), max_level(_max_level)
 		{
+			if (int(log2(std::min(_width, _height))) - 2 <= _max_level)
+			{
+					cout << "Max level " << _max_level << " is too high. Recommend " << int(log2(std::min(_width, _height))) - 3 << endl;
+					assert(false);
+					exit(-1);
+			}
 		}
 
 		~BalancedQuadtree()
