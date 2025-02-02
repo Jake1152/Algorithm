@@ -91,6 +91,17 @@ int main(int argc, char** argv)
 		{
 			// TODO: 빈칸 채우기 용도라기 보다는, 
 			//       지도 이미지 읽어들이는 방법을 자연스럽게 알려드리는 용도로 제공해드리는 코드입니다.
+			qtree.DeleteAll();
+
+			qtree.Insert(start_point, true);
+			qtree.Insert(end_point, true);
+
+			// 시작점과 끝 점을 실제로 만들어진 쿼드트리 노드의 중심으로 업데이트
+			start_point = qtree.FindLeaf(start_point)->Center();
+			end_point = qtree.FindLeaf(end_point)->Center();
+
+			start_prev = start_point;
+			end_prev = end_point;
 
 			// 지도를 읽어들여서 쿼드 트리 분할
 			// 검은색 픽셀은 갈 수 없는 곳, 흰색 픽셀은 갈 수 있는 곳을 의미
@@ -107,6 +118,7 @@ int main(int argc, char** argv)
 						{
 							// TODO: 흰색과 검은색이 만나는 가장자리 입니다.
 							// TODO: 흰색과 검은색이 만나는 가장자리에서는 무엇을 해야할까?
+							qtree.Insert({ c,r }, true); // colum: x좌표, y좌표 (openCV 이미지 행렬 특징)
 						}
 					}
 				}
@@ -114,15 +126,44 @@ int main(int argc, char** argv)
 			// qtree.SplitMax();   // 최대 해상도로 모두 분할 (테스트용)
 
 			// TODO: g에 edge 추가
-			// TOKNOW: g는 무엇인가>
+			// TOKNOW: g는 무엇인가?
+			qtree.FindNeighbors();
 
+			// 그래프에는 연결관계만 저장되고, 노드의 좌표는 쿼드트리 사용
+			// 그래프의 정점 수는 쿼드트리의 리프노드의 수와 같음
+			EdgeWeightedDigraph g(int(qtree.leaves.size()));
+
+			vector<double> heur(qtree.leaves.size());
+			
+			int	start_index = qtree.FindLeaf(start_point)->index;
+			int	end_index = qtree.FindLeaf(end_point)->index;
+
+			for (auto* l : qtree.leaves)
+			{
+				auto diff = l->Center() - qtree.leaves[end_index]->Center();
+				heur[l->index] = std::abs(diff.x) + std::abs(diff.y);
+
+				if (map.at<Vec3b>(l->Center().y, l->Center().x)[0] == 0)
+					continue;
+
+				for (auto* adj : l->neighbors) // 그래프에서 정점 사이의 연결관계 만들기
+				{
+					if (map.at<Vec3b>(adj->Center().y, adj->Center().x)[0] == 0)
+						continue;
+					
+					double dist = cv::norm(l->Center() - qtree.leaves[adj->index]->Center());
+
+					g.AddEdge(hlab::DirectedEdge(l->index, adj->index, dist));
+				}
+			}
 			// TODO: d.Initialize(g, start_index, end_index, heur);
+			d.Initialize(g, start_index, end_index, heur);
 		}
 
-		//if (!hlab::left_down) // 마우스로 드래그하는 동안에는 경로 업데이트 중지
-		//	d.Update(); // 힌트
+		if (!hlab::left_down) // 마우스로 드래그하는 동안에는 경로 업데이트 중지
+			d.Update(); // 힌트
 
-		// auto path = d.GetPath(); // 힌트
+		auto path = d.GetPath(); // 힌트
 
 		hlab::preframe();
 
@@ -135,6 +176,26 @@ int main(int argc, char** argv)
 		DisplayQuadtree(image, qtree.root);
 
 		// TODO:
+		//  경로를 찾는 과정에서 방문한 정점들 표시
+		for (int i = 0; i < qtree.leaves.size(); i++)
+		{
+			Point p = qtree.leaves[i]->Center();
+
+			if (d.visited[i])
+				cv::circle(image, p, 3, kPureBlue, -1, LINE_AA);
+			else
+				cv::circle(image, p, 3, kBrightGray, -1, LINE_AA);
+		}
+
+		for (int i = 1; i < path.size(); i++)
+		{
+			Point start = qtree.leaves[path[i - 1]]->Center();
+			Point end = qtree.leaves[path[i]]->Center();
+			cv::line(image, start, end, kPureBlue, 1, LINE_AA);
+		}
+
+		cv::circle(image, start_point, 7, kPureRed, -1, LINE_AA);
+		cv::circle(image, end_point, 7, kPureRed, -1, LINE_AA);
 
 		if (hlab::postframe()) break;
 	}
